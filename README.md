@@ -1,51 +1,52 @@
 # Virtual Stick Waypoints
 We must add 2 listeners for the aircraft location and the aircraft heading
 
-  self.aircraftLocation
-  self.aircraftHeading
+	self.aircraftLocation
+	self.aircraftHeading
 
-  if let locationKey = DJIFlightControllerKey(param: DJIFlightControllerParamAircraftLocation)  {
-   DJISDKManager.keyManager()?.startListeningForChanges(on: locationKey, withListener: self) { [unowned self] (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
-    if newValue != nil {
-     let newLocationValue = newValue!.value as! CLLocation
+	if let locationKey = DJIFlightControllerKey(param: DJIFlightControllerParamAircraftLocation)  {
+		DJISDKManager.keyManager()?.startListeningForChanges(on: locationKey, withListener: self) { [unowned self] (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
+		if newValue != nil {
+		let newLocationValue = newValue!.value as! CLLocation
 
-     if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
-      self.aircraftLocation = newLocationValue.coordinate                   
-     }
-    }
-   }
-   DJISDKManager.keyManager()?.getValueFor(locationKey, withCompletion: { (value:DJIKeyedValue?, error:Error?) in
-    if value != nil {
-     let newLocationValue = value!.value as! CLLocation
-     if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
-      self.aircraftLocation = newLocationValue.coordinate
-     }
-    }
-   })
-  }
+		if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+			self.aircraftLocation = newLocationValue.coordinate                   
+		}
+		}
+	}
+	DJISDKManager.keyManager()?.getValueFor(locationKey, withCompletion: { (value:DJIKeyedValue?, error:Error?) in
+	if value != nil {
+		let newLocationValue = value!.value as! CLLocation
+		if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+			self.aircraftLocation = newLocationValue.coordinate
+		}
+		}
+		})
+	}
 
 We must add a timer to send continuous commands to the aircraft.
 Mission Array like Litchi CVS
 The simplified version without actions
-[[Double]]
-[[Waypoint]]
-[[lat,lon,alt,pitch]]
 
-var grid = [[Double]]
+	[[Double]]
+	[[Waypoint]]
+	[[lat,lon,alt,pitch]]
+
+	var grid = [[Double]]
 
 We can add action in the array or read Litchi CSV
 
- [[lat,lon,alt,pitch, action_type, POIlat, POIlon…]]
+	[[lat,lon,alt,pitch, action_type, POIlat, POIlon…]]
 
 We must create the mission in an array before we start it in GCD
 # GCD dispatch groups
 We create for each GCD action one dispatch group
 
- var queue = DispatchQueue(label: "ch.hdrpano.myqueue")
- var photoDispatchGroup = DispatchGroup()
- var aircraftDispatchGroup = DispatchGroup()
- var gimbalDispatchGroup = DispatchGroup()
- …
+	 var queue = DispatchQueue(label: "ch.hdrpano.myqueue")
+	 var photoDispatchGroup = DispatchGroup()
+	 var aircraftDispatchGroup = DispatchGroup()
+	 var gimbalDispatchGroup = DispatchGroup()
+	 …
 # Start virtual stick
 When we use virtual stick, the remote controller will be out of service for the pilot. This is dangerous. For this reason, we pack all in async queue to stop the mission at any time we want and to stop virtual stick. We must handle the remaining power of the aircraft too. When the capacity is below 30% we must stop the mission and virtual stick. 
 
