@@ -163,7 +163,7 @@ class TimelineMissionViewController: UIViewController, UICollectionViewDelegate,
         var image: UIImage!
         
         if annotation.isEqual(self.aircraftAnnotation) {
-            image = #imageLiteral(resourceName: "aircraft")
+            image = #imageLiteral(resourceName: "drone")
         } else if annotation.isEqual(self.homeAnnotation) {
             image = #imageLiteral(resourceName: "navigation_poi_pin")
         }

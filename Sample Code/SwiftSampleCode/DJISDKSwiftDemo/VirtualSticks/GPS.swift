@@ -12,13 +12,11 @@ class GPS {
     
     //MARK:- Yaw +/- 180°
     func yawControl(yaw: Float) -> Float {
-        // return Float((Int(yaw) + 540) % 360 - 180)
-        if yaw >= 180 {
-            return yaw - 360
-        } else if yaw < -180 {
-            return yaw + 360
+        if yaw == 180 {
+            return 180
+        } else {
+            return Float((Int(yaw) + 540) % 360 - 180)
         }
-        return yaw
     }
        
    //MARK:- GPS Bearing

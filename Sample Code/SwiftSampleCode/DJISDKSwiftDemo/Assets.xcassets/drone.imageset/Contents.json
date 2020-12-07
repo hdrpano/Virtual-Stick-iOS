@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "set_waypoint_40.png",
+      "filename" : "Mavic 40.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "set_waypoint_80.png",
+      "filename" : "Mavic 50.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "set_waypoint_120.png",
+      "filename" : "Mavic 120.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
