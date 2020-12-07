@@ -683,9 +683,12 @@
                                     <constraint firstAttribute="height" constant="50" id="rYW-ue-Oui"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                <state key="normal" title="GPS fly 20m 45°" backgroundImage="btn">
+                                <state key="normal" title="GPS Fly VS Mission" backgroundImage="btn">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
+                                <connections>
+                                    <action selector="startVSMission:" destination="Pxd-4i-Efk" eventType="touchUpInside" id="C6Q-4e-R6U"/>
+                                </connections>
                             </button>
                         </subviews>
                         <constraints>

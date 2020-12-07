@@ -96,10 +96,9 @@ class VirtualSticksController {
     }
     
     //MARK:- Move Gimbal
-    func yawGimbal(pitch: Float, roll: Float = 0, yaw: Float = 0, time: Double = 1.0, rotationMode: DJIGimbalRotationMode = DJIGimbalRotationMode.absoluteAngle) {
+    func moveGimbal(pitch: Float, roll: Float = 0, yaw: Float = 0, time: Double = 1.0, rotationMode: DJIGimbalRotationMode = DJIGimbalRotationMode.absoluteAngle) {
         // Rotation is relative to aicraft heading where 0 degrees is nose of aircraft, realitve means to the last position, absolut means to the heading
         let rotation: DJIGimbalRotation = DJIGimbalRotation.init(pitchValue: pitch as NSNumber, rollValue: roll as NSNumber, yawValue: yaw as NSNumber, time: time as TimeInterval, mode: rotationMode, ignore: true)
-        // Retrieve the gimbal and issue the rotation command
         let gimbal = self.fetchGimbal()
         if gimbal != nil {
             gimbal?.rotate(with: rotation, completion: { (error: Error?) in
@@ -116,13 +115,13 @@ class VirtualSticksController {
     }
     
     //MARK:- Yaw Aircraft Virtual Stick
-    func yaw(yawAngle: Float) {
+    func vsYaw(yaw: Float) {
         let fc = self.fetchFlightController()
         fc?.rollPitchCoordinateSystem = .ground
         fc?.yawControlMode = .angle
         fc?.verticalControlMode = .velocity
 
-        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: 0, roll: 0, yaw: yawAngle, verticalThrottle: 0)
+        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: 0, roll: 0, yaw: yaw, verticalThrottle: 0)
         fc?.send(ctrlData, withCompletion: {
             (error) in
             if let error = error {

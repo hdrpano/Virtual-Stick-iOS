@@ -42,9 +42,10 @@ class VirtualSticksViewController: UIViewController {
     var aircraftDispatchGroup = DispatchGroup()
     var gimbalDispatchGroup = DispatchGroup()
     var GCDaircraft: Bool = true
-    var GCDphotoLB: Bool = true
+    var GCDphoto: Bool = true
     var GCDgimbal: Bool = true
-    var GCDvs: Bool = true
+    var GCDvs: Bool = false
+    var GCDProcess: Bool = false
     
     var radians: Float = 0.0
     let velocity: Float = 0.1
@@ -65,6 +66,11 @@ class VirtualSticksViewController: UIViewController {
     var targetAircraftYaw: Double = 0
     var targetGimbalPitch: Double = 0
     var targetGimbalYaw: Double = 0
+    var gimbalPitch: Double = 0
+    let start = Date()
+    var GCDaircraftFT: Double = 0
+    var GCDgimbalFT: Double = 0
+    var GCDvsFT: Double = 0
     var vsSpeed: Float = 0
     var GPSController = GPS()
     var vsController = VirtualSticksController()
@@ -107,6 +113,9 @@ class VirtualSticksViewController: UIViewController {
                         print("Error setting multiple flight mode");
                     }
                 })
+                
+                // Add the key listener for the aircraft
+                self.addKeys()
             }
             
         }
@@ -214,6 +223,10 @@ class VirtualSticksViewController: UIViewController {
         }
     }
     
+    @IBAction func startVSMission(_ sender: UIButton) {
+        self.startVSLinearNow()
+    }
+    
     // Timer loop to send values to the flight controller
     @objc func timerLoop() {
         
@@ -280,8 +293,8 @@ class VirtualSticksViewController: UIViewController {
     
     //MARK: GCD Timer
     @objc func updateGCD() {
-        // if !self.GCDaircraft  { self.showAircraftYaw() }
-        // if !self.GCDgimbal  { self.showGimbal() }
+        if !self.GCDaircraft  { self.showAircraftYaw() }
+        if !self.GCDgimbal  { self.showGimbal() }
         // if !self.GCDphoto  { self.showPhoto() }
         if !self.GCDvs { self.showVS() }
     }
@@ -300,37 +313,30 @@ class VirtualSticksViewController: UIViewController {
         }
     }
     
-    //MARK: Yaw Aircraft Virtual Stick
-    func vsYaw(yawAngle: Float) {
-        let fc = self.flightController
-        fc?.rollPitchCoordinateSystem = .ground
-        fc?.yawControlMode = .angle
-        fc?.verticalControlMode = .velocity
-
-        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: 0, roll: 0, yaw: yawAngle, verticalThrottle: 0)
-        fc?.send(ctrlData, withCompletion: {
-            (error) in
-            if let error = error {
-                print("Unable to yaw aircraft \(error)")
-            }
-        })
+    //MARK: Virtual Stick Yaw Aircraft
+    func yawAircraft() {
+        self.aircraftDispatchGroup.enter()
+        self.GCDaircraft = false
+        self.GCDaircraftFT = self.start.timeIntervalSinceNow * -1
+        self.vsController.vsYaw(yaw: Float(self.targetAircraftYaw))
+        self.aircraftDispatchGroup.wait()
     }
     
-    //MARK: Virtual Stick Move
-    func vsMove(pitch: Float, roll: Float, yaw: Float, vertical: Float) {
-        let fc = self.flightController
-        fc?.rollPitchCoordinateSystem = .body
-        fc?.rollPitchControlMode = .velocity
-        fc?.yawControlMode = .angle
-        fc?.verticalControlMode = .position
-
-        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: pitch, roll: roll, yaw: yaw, verticalThrottle: vertical)
-        fc?.send(ctrlData, withCompletion: {
-            (error) in
-            if let error = error {
-                print("Unable to use virtual stick \(error)")
-            }
-        })
+    //MARK: Virtual Stick Move Aircraft
+    func moveAircraft() {
+        self.aircraftDispatchGroup.enter()
+        self.GCDvs = false
+        self.GCDvsFT = self.start.timeIntervalSinceNow * -1
+        self.aircraftDispatchGroup.wait()
+    }
+    
+    //MARK: Move Gimbal GCD
+    func moveGimbal() {
+        self.gimbalDispatchGroup.enter()
+        self.GCDgimbal = false
+        self.GCDgimbalFT = self.start.timeIntervalSinceNow * -1
+        self.vsController.moveGimbal(pitch: Float(self.targetGimbalPitch), roll: 0, yaw: 0, time: 1, rotationMode: .absoluteAngle)
+        self.gimbalDispatchGroup.wait()
     }
     
     private func addKeys() {
@@ -375,6 +381,7 @@ class VirtualSticksViewController: UIViewController {
                     let nsvalue = newValue!.value as! NSValue
                     nsvalue.getValue(&gimbalAttitude)
                     self.gimbalPitchLabel.text = String((gimbalAttitude.pitch*10).rounded()/10)
+                    self.gimbalPitch = Double(gimbalAttitude.pitch)
                 }
             })
         }
@@ -388,34 +395,19 @@ class VirtualSticksViewController: UIViewController {
                 }
             })
         }
-    }
-    
-    //MARK: Move Gimbal GCD
-    func moveGimbal(pitch: Float, roll: Float, yaw: Float, time: Double = 1.0, dyaw: Float = 0, gimbalRotationMode: DJIGimbalRotationMode = .absoluteAngle) {
-        // let pano = PanoramaController()
-        self.gimbalDispatchGroup.enter()
-        self.GCDgimbal = false
-        // self.GCDgimbalFT = self.start.timeIntervalSinceNow * -1
-        self.targetGimbalPitch = Double(pitch)
-        self.targetGimbalYaw = Double(yaw)
-        if gimbalRotationMode == .absoluteAngle {
-            let cyaw = self.GPSController.yawControl(yaw: yaw-Float(self.aircraftHeading))
-            self.vsController.yawGimbal(pitch: pitch, roll: 0, yaw: cyaw, time: time, rotationMode: DJIGimbalRotationMode.absoluteAngle)
-        } else {
-            self.vsController.yawGimbal(pitch: pitch, roll: 0, yaw: dyaw, time: time, rotationMode: DJIGimbalRotationMode.relativeAngle)
+        
+        //MARK: Home Location Listener
+        if let homeLocationKey = DJIFlightControllerKey(param: DJIFlightControllerParamHomeLocation)  {
+            DJISDKManager.keyManager()?.startListeningForChanges(on: homeLocationKey, withListener: self) { [unowned self] (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
+                if newValue != nil {
+                    let newLocationValue = newValue!.value as! CLLocation
+                    
+                    if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+                        self.homeLocation = newLocationValue.coordinate
+                    }
+                }
+            }
         }
-        self.gimbalDispatchGroup.wait()
-    }
-    
-    //MARK: Yaw Aircraft GCD
-    func yawAircraft(yaw: Float) {
-        // let pano = PanoramaController()
-        self.aircraftDispatchGroup.enter()
-        self.GCDaircraft = false
-        // self.GCDaircraftFT = self.start.timeIntervalSinceNow * -1
-        self.targetAircraftYaw = Double(yaw)
-        self.vsController.yaw(yawAngle: yaw)
-        self.aircraftDispatchGroup.wait()
     }
         
     //MARK: Show Virtual Stick Move
@@ -426,7 +418,7 @@ class VirtualSticksViewController: UIViewController {
         if distance <= Double(self.vsSpeed) {
             self.vsSpeed = Float(distance / 2)
             if distance < 2 {
-                print("Close, slow speed \((self.vsSpeed*10).rounded()/10)m/s distance to target \((distance*10).rounded()/10)m \(self.aircraftLocation.latitude) \(self.aircraftLocation.longitude)")
+                print("Close, slow speed \((self.vsSpeed*10).rounded()/10)m/s distance to target \((distance*10).rounded()/10)m")
             }
         } else {
             print("Move, distance to target \((distance*10).rounded()/10)m speed \((self.vsSpeed*10).rounded()/10)m/s")
@@ -443,10 +435,143 @@ class VirtualSticksViewController: UIViewController {
             print("Move vertical \(Int(self.aircraftAltitude)) target [\(Int(self.vsTargetAltitude))")
         }
         
+        self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(self.vsTargetBearing), vertical: Float(self.vsTargetAltitude))
+        
         if distance < 1.1 && self.aircraftAltitude - self.vsTargetAltitude < 1.1 {
             self.GCDvs = true
             self.aircraftDispatchGroup.leave()
             print("VS Mission step complete")
+        }
+    }
+    
+    //MARK: Show Aircraft Yaw
+    func showAircraftYaw() {
+        let time = self.start.timeIntervalSinceNow * -1 - self.GCDaircraftFT
+        if !self.GCDaircraft && time > 0.9 {
+            var diff: Double = abs(self.self.aircraftHeading - self.targetAircraftYaw)
+            if diff >= 180 { diff = abs(diff - 360) }
+            if diff < 2 { // 1.5° - 3°
+                print("Aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
+                self.GCDaircraft = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.aircraftDispatchGroup.leave()
+                }
+            } else {
+                print("Wait on aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
+                self.vsController.vsYaw(yaw: Float(self.targetAircraftYaw)) // repeat between 5 and 20Hz perfect with the listener
+            }
+            if time > 5 && !self.GCDaircraft {
+                self.aircraftDispatchGroup.leave()
+                self.GCDaircraft = true
+                print("Timeout on aircraft yaw!")
+            }
+        }
+    }
+    
+    //MARK: Show Gimbal Yaw
+    func showGimbal() {
+        let time = self.start.timeIntervalSinceNow * -1 - self.GCDgimbalFT
+        if !self.GCDgimbal && time > 0.9 {
+            let pitchDiff = abs(self.gimbalPitch - self.targetGimbalPitch)
+            if pitchDiff < 2 { //  1.5° - 3°
+                print("Gimbal pitch \((pitchDiff*10).rounded()/10) heading \((self.aircraftHeading*10).rounded()/10)")
+                self.GCDgimbal = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.gimbalDispatchGroup.leave()
+                }
+            } else {
+                print("Wait on gimbal pitch \(self.gimbalPitch) timeout \((time*10).rounded()/10)")
+            }
+            if time > 2 {
+                self.GCDgimbal = true
+                self.gimbalDispatchGroup.leave()
+                print("Timeout on gimbal yaw!")
+            }
+        }
+    }
+    
+    //MARK: Start 2D Virtual Stick Mission
+    func startVSLinearNow() {
+        var grid: Array = [[Double]]()
+        let speed: Float = 8
+        self.vsSpeed = speed
+        
+        let aircraftLocationStart:CLLocationCoordinate2D = self.aircraftLocation
+        let altitude: Double = self.aircraftAltitude
+        let pitch: Double = -90
+       
+        // self.panoController.setGimbalMode(gimbalMode: .yawFollow)
+        // self.panoController.setYawSimultaneousFollow(enabled: true)
+    
+        if !self.vsController.isVirtualStick() { self.vsController.startVirtualStick() }
+        if !self.vsController.isVirtualStickAdvanced() { self.vsController.startAdvancedVirtualStick() }
+        
+        let offset = 0.00000899321605956683 * 10 // 10m 0.00000899321605956683
+        
+        self.GCDvs = true
+        self.GCDProcess = true
+        
+        self.timer = Timer.scheduledTimer(timeInterval: 0.05, target: self, selector: #selector(updateGCD), userInfo: nil, repeats: true)
+    
+        self.queue.asyncAfter(deadline: .now() + 1.0) {
+            
+            grid = [[aircraftLocationStart.latitude + offset / 2, aircraftLocationStart.longitude + offset / 2, altitude, pitch],
+                    [aircraftLocationStart.latitude + offset / 2, aircraftLocationStart.longitude - offset, altitude, pitch],
+                    [aircraftLocationStart.latitude - offset, aircraftLocationStart.longitude - offset, altitude, pitch],
+                    [aircraftLocationStart.latitude - offset, aircraftLocationStart.longitude + offset, altitude, pitch],
+                    [aircraftLocationStart.latitude, aircraftLocationStart.longitude, altitude, pitch]]
+            
+
+            print("Mission count \(grid.count)")
+            
+            print(grid)
+            
+            self.targetGimbalPitch = 0
+            self.moveGimbal()
+            for mP in grid {
+                let index = grid.firstIndex(of: mP) ?? 0
+                if index >= 0 { // Later for multiple flights
+                    let lat = mP[0]
+                    let lon = mP[1]
+                    let alt = mP[2]
+                    let pitch = mP[3]
+                    
+                    if CLLocationCoordinate2DIsValid(CLLocationCoordinate2DMake(lat, lon)) && alt < 250 {
+        
+                        self.vsTargetLocation.latitude = lat
+                        self.vsTargetLocation.longitude = lon
+                        self.vsTargetAltitude = alt
+                        self.targetGimbalPitch = pitch
+                        
+                        self.moveGimbal()
+                        
+                        let bearing:Float = Float(self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: CLLocationCoordinate2D(latitude: lat, longitude: lon)))
+                        
+                        if abs(Float(self.aircraftHeading) - bearing) > 14 {
+                            print("VS yaw for smooth straight")
+                            self.targetAircraftYaw = Double(bearing)
+                            self.yawAircraft()
+                        }
+                        
+                        print("VS move")
+                        self.vsSpeed = speed
+                        self.moveAircraft()
+                        if self.GCDProcess == false { break }
+                        
+                        // print("Photo")
+                        // self.takePhoto()
+                        // if self.GCDProcess == false { break }
+                    
+                    }
+                }
+            }
+            
+            print("Stop VS")
+            if self.vsController.isVirtualStick() { self.vsController.stopVirtualStick() }
+            if self.vsController.isVirtualStickAdvanced() { self.vsController.stopAdvancedVirtualStick() }
+            self.GCDProcess = false
+            self.GCDvs = false
+            if self.timer != nil { self.timer?.invalidate() }
         }
     }
 

@@ -13,8 +13,8 @@
 		2F0FC86C21EE058900D1C635 /* libDJIWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F0FC86B21EE058900D1C635 /* libDJIWidget.a */; };
 		2F0FC86E21EE1D0300D1C635 /* DecodeImageCalibrateLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0FC86D21EE1D0300D1C635 /* DecodeImageCalibrateLogic.swift */; };
 		2F0FC87921F06D9B00D1C635 /* DistortionResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 2F0FC87821F06D9B00D1C635 /* DistortionResource.bundle */; };
-		39419FDA257930D300C19E7C /* VirtualSticksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39419FD9257930D300C19E7C /* VirtualSticksController.swift */; };
 		3945144A24E1D01E00F1319B /* GPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3945144924E1D01E00F1319B /* GPS.swift */; };
+		39A7A4D5257E5B62000FB077 /* VirtualSticksController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39A7A4D4257E5B62000FB077 /* VirtualSticksController.swift */; };
 		51AAFCD221FEB35900742997 /* DJIAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51AAFCD121FEB35900742997 /* DJIAlert.swift */; };
 		A1557083AB906DC1A214AFDB /* libPods-DJISDKSwiftDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A7E8DEF306B5A65A27249FC8 /* libPods-DJISDKSwiftDemo.a */; };
 		A402788320AD473E0072809B /* FlightHubViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A402788220AD473E0072809B /* FlightHubViewController.swift */; };
@@ -40,8 +40,8 @@
 		2F0FC86B21EE058900D1C635 /* libDJIWidget.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libDJIWidget.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F0FC86D21EE1D0300D1C635 /* DecodeImageCalibrateLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecodeImageCalibrateLogic.swift; sourceTree = "<group>"; };
 		2F0FC87821F06D9B00D1C635 /* DistortionResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DistortionResource.bundle; sourceTree = "<group>"; };
-		39419FD9257930D300C19E7C /* VirtualSticksController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualSticksController.swift; sourceTree = "<group>"; };
 		3945144924E1D01E00F1319B /* GPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GPS.swift; path = VirtualSticks/GPS.swift; sourceTree = "<group>"; };
+		39A7A4D4257E5B62000FB077 /* VirtualSticksController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VirtualSticksController.swift; path = VirtualSticks/VirtualSticksController.swift; sourceTree = "<group>"; };
 		4B0C6B02B8D1383630F1B67E /* Pods-DJISDKSwiftDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DJISDKSwiftDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DJISDKSwiftDemo/Pods-DJISDKSwiftDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		51AAFCD121FEB35900742997 /* DJIAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DJIAlert.swift; sourceTree = "<group>"; };
 		86985CC91E834EC200577EC7 /* DJISDKSwiftDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DJISDKSwiftDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,9 +86,9 @@
 		238F549024D3819B00B84EA3 /* VirtualSticks */ = {
 			isa = PBXGroup;
 			children = (
+				39A7A4D4257E5B62000FB077 /* VirtualSticksController.swift */,
 				3945144924E1D01E00F1319B /* GPS.swift */,
 				238F549124D381B900B84EA3 /* VirtualSticksViewController.swift */,
-				39419FD9257930D300C19E7C /* VirtualSticksController.swift */,
 			);
 			name = VirtualSticks;
 			sourceTree = "<group>";
@@ -340,11 +340,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				39419FDA257930D300C19E7C /* VirtualSticksController.swift in Sources */,
 				A47868E2209AC6DA00DBC666 /* DJIImageAnnotation.swift in Sources */,
 				2F0FC85D21EDC06100D1C635 /* VideoPreviewerAdapter.swift in Sources */,
 				A47868E0209AC6DA00DBC666 /* ProductCommunicationManager.swift in Sources */,
 				A402788320AD473E0072809B /* FlightHubViewController.swift in Sources */,
+				39A7A4D5257E5B62000FB077 /* VirtualSticksController.swift in Sources */,
 				A47868D7209AC6DA00DBC666 /* AppDelegate.swift in Sources */,
 				238F549224D381B900B84EA3 /* VirtualSticksViewController.swift in Sources */,
 				A47868E1209AC6DA00DBC666 /* StartupViewController.swift in Sources */,
