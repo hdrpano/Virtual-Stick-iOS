@@ -1,6 +1,7 @@
 //  VirtualSticksViewController.swift
 //  Created by Dennis Baldwin on 3/18/20.
-//  Copyright © 2020 DroneBlocks, LLC. All rights reserved.
+//  GPS Virtual Stick added by Kilian Eisenegger 01.12.2020
+//  Copyright © 2020 DroneBlocks & hdrpano, LLC. All rights reserved.
 //
 //  Make sure you know what you're doing before running this code. This code makes use of the Virtual Sticks API.
 //  This code has only been tested on DJI Spark, but should work on other DJI platforms. I recommend doing this outdoors to get familiar with the
@@ -55,7 +56,7 @@ class VirtualSticksViewController: UIViewController {
     var yaw: Float = 0.0
     var missionRadius: Float = 0.0
     
-    //MARK: Variables
+    //MARK: GPS Variables
     var aircraftLocation: CLLocationCoordinate2D = kCLLocationCoordinate2DInvalid
     var homeLocation: CLLocationCoordinate2D = kCLLocationCoordinate2DInvalid
     var vsTargetLocation: CLLocationCoordinate2D = kCLLocationCoordinate2DInvalid
