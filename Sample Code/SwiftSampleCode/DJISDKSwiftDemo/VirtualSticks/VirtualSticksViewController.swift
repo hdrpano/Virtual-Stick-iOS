@@ -83,6 +83,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                 self.flightController = fc
                 
                 // stop Virtual Stick if somebody touches the sticks
+                // We get into real Pro stuff with this (C) Kilian Eisenegger
                 let rc = aircraft.remoteController
                 if rc != nil {
                     rc?.delegate = self
@@ -192,6 +193,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     }
                 }
             }
+            // We get into real Pro stuff with this (C) Kilian Eisenegger
             DJISDKManager.keyManager()?.getValueFor(locationKey, withCompletion: { (value:DJIKeyedValue?, error:Error?) in
                 if value != nil {
                     let newLocationValue = value!.value as! CLLocation
