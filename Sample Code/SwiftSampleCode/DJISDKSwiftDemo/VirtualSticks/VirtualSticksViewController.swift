@@ -1,6 +1,7 @@
 //  VirtualSticksViewController.swift
 //
 //  GPS Virtual Stick added by Kilian Eisenegger 01.12.2020
+//  This is a project from Dennis Baldwin and Kilian Eisenegger
 //  Copyright © 2020 DroneBlocks & hdrpano. All rights reserved.
 //
 
@@ -87,17 +88,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     rc?.delegate = self
                 }
                 
-                print("We have a reference to the FC")
-                
-                // Default the coordinate system to ground
-                self.flightController?.rollPitchCoordinateSystem = DJIVirtualStickFlightCoordinateSystem.ground
-                
-                // Default roll/pitch control mode to velocity
-                self.flightController?.rollPitchControlMode = DJIVirtualStickRollPitchControlMode.velocity
-                
-                // Set control modes
-                self.flightController?.yawControlMode = DJIVirtualStickYawControlMode.angularVelocity
-                
                 // Prepare Virtual Stick
                 let fcMode = DJIFlightOrientationMode.aircraftHeading
                 self.flightController?.setFlightOrientationMode(fcMode, withCompletion: { (error: Error?) in
@@ -112,10 +102,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     }
                 })
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                /*DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     let viewRegion = MKCoordinateRegion(center: self.homeLocation, latitudinalMeters: 100, longitudinalMeters: 100)
                     self.mapView.setRegion(viewRegion, animated: true)
-                }
+                }*/
             }
             
         }
@@ -202,6 +192,19 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     }
                 }
             }
+            DJISDKManager.keyManager()?.getValueFor(locationKey, withCompletion: { (value:DJIKeyedValue?, error:Error?) in
+                if value != nil {
+                    let newLocationValue = value!.value as! CLLocation
+                    if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+                        self.aircraftLocation = newLocationValue.coordinate
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            let viewRegion = MKCoordinateRegion(center: self.aircraftLocation, latitudinalMeters: 500, longitudinalMeters: 500)
+                            self.mapView.setRegion(viewRegion, animated: true)
+                            self.mapView.setNeedsDisplay()
+                        }
+                    }
+                }
+            })
         }
         
         //MARK: Aircraft Attitude Listener
@@ -375,10 +378,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         var grid: Array = [[Double]]()
         let speed: Float = 8
         self.vsSpeed = speed
-        let aircraftLocationStart:CLLocationCoordinate2D = self.homeLocation
+        let aircraftLocationStart:CLLocationCoordinate2D = self.aircraftLocation
         let altitude: Double = self.aircraftAltitude
         let pitch: Double = -90
-        let offset = 0.00000899321605956683 * 10 // 10m 0.00000899321605956683
+        let offset = 0.00000899321605956683 * 30 // 10m 0.00000899321605956683
 
         self.timer = Timer.scheduledTimer(timeInterval: 0.05, target: self, selector: #selector(updateGCD), userInfo: nil, repeats: true)
         self.sdCardCount = self.camController.getSDPhotoCount()
@@ -390,10 +393,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     
         self.queue.asyncAfter(deadline: .now() + 1.0) {
             
-            grid = [[aircraftLocationStart.latitude + offset / 2, aircraftLocationStart.longitude + offset / 2, altitude, pitch],
-                    [aircraftLocationStart.latitude + offset / 2, aircraftLocationStart.longitude - offset, altitude, pitch],
-                    [aircraftLocationStart.latitude - offset, aircraftLocationStart.longitude - offset, altitude, pitch],
-                    [aircraftLocationStart.latitude - offset, aircraftLocationStart.longitude + offset, altitude, pitch],
+            grid = [[aircraftLocationStart.latitude + offset / 4, aircraftLocationStart.longitude + offset / 2, altitude, pitch],
+                    [aircraftLocationStart.latitude + offset / 4, aircraftLocationStart.longitude - offset / 2, altitude, pitch],
+                    [aircraftLocationStart.latitude - offset / 4, aircraftLocationStart.longitude - offset / 2, altitude, pitch],
+                    [aircraftLocationStart.latitude - offset / 4, aircraftLocationStart.longitude + offset / 2, altitude, pitch],
                     [aircraftLocationStart.latitude, aircraftLocationStart.longitude, altitude, pitch]]
             
             print("Mission count \(grid.count)")

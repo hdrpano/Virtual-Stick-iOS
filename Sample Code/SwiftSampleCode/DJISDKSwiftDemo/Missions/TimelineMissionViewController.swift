@@ -115,6 +115,16 @@ class TimelineMissionViewController: UIViewController, UICollectionViewDelegate,
                     }
                 }
             }
+            DJISDKManager.keyManager()?.getValueFor(aircarftLocationKey, withCompletion: { (value:DJIKeyedValue?, error:Error?) in
+                if value != nil {
+                    let newLocationValue = value!.value as! CLLocation
+                    if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+                        if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+                            self.aircraftAnnotation.coordinate = newLocationValue.coordinate
+                        }
+                    }
+                }
+            })
         }
         
         
@@ -363,6 +373,7 @@ class TimelineMissionViewController: UIViewController, UICollectionViewDelegate,
     }
     
     func defaultWaypointMission() -> DJIWaypointMission? {
+        var grid: Array = [[Double]]()
         let mission = DJIMutableWaypointMission()
         mission.maxFlightSpeed = 15
         mission.autoFlightSpeed = 8
@@ -388,64 +399,39 @@ class TimelineMissionViewController: UIViewController, UICollectionViewDelegate,
         if !CLLocationCoordinate2DIsValid(droneCoordinates) {
             return nil
         }
-
+        
         mission.pointOfInterest = droneCoordinates
-        let offset = 0.0000899322
+        let offset = 0.00000899321605956683 * 10 // 10m 0.00000899321605956683
         
-        let loc1 = CLLocationCoordinate2DMake(droneCoordinates.latitude + offset, droneCoordinates.longitude)
-        let waypoint1 = DJIWaypoint(coordinate: loc1)
-        waypoint1.altitude = 25
-        waypoint1.heading = 0
-        waypoint1.actionRepeatTimes = 1
-        waypoint1.actionTimeoutInSeconds = 60
-        waypoint1.cornerRadiusInMeters = 5
-        waypoint1.turnMode = .clockwise
-        waypoint1.gimbalPitch = 0
+        grid = [[droneCoordinates.latitude + offset / 4, droneCoordinates.longitude + offset / 2, 25, 0],
+                [droneCoordinates.latitude + offset / 4, droneCoordinates.longitude - offset / 2, 26, -90],
+                [droneCoordinates.latitude - offset / 4, droneCoordinates.longitude - offset / 2, 27, 0],
+                [droneCoordinates.latitude - offset / 4, droneCoordinates.longitude + offset / 2, 28, -90],
+                [droneCoordinates.latitude, droneCoordinates.longitude, 25, 0]]
         
-        let loc2 = CLLocationCoordinate2DMake(droneCoordinates.latitude, droneCoordinates.longitude + offset)
-        let waypoint2 = DJIWaypoint(coordinate: loc2)
-        waypoint2.altitude = 26
-        waypoint2.heading = 0
-        waypoint2.actionRepeatTimes = 1
-        waypoint2.actionTimeoutInSeconds = 60
-        waypoint2.cornerRadiusInMeters = 5
-        waypoint2.turnMode = .clockwise
-        waypoint2.gimbalPitch = -90
-        
-        let loc3 = CLLocationCoordinate2DMake(droneCoordinates.latitude - offset, droneCoordinates.longitude)
-        let waypoint3 = DJIWaypoint(coordinate: loc3)
-        waypoint3.altitude = 27
-        waypoint3.heading = 0
-        waypoint3.actionRepeatTimes = 1
-        waypoint3.actionTimeoutInSeconds = 60
-        waypoint3.cornerRadiusInMeters = 5
-        waypoint3.turnMode = .clockwise
-        waypoint3.gimbalPitch = 0
-        
-        let loc4 = CLLocationCoordinate2DMake(droneCoordinates.latitude, droneCoordinates.longitude - offset)
-        let waypoint4 = DJIWaypoint(coordinate: loc4)
-        waypoint4.altitude = 28
-        waypoint4.heading = 0
-        waypoint4.actionRepeatTimes = 1
-        waypoint4.actionTimeoutInSeconds = 60
-        waypoint4.cornerRadiusInMeters = 5
-        waypoint4.turnMode = .clockwise
-        waypoint4.gimbalPitch = -90
-        
-        let waypoint5 = DJIWaypoint(coordinate: loc1)
-        waypoint5.altitude = 29
-        waypoint5.heading = 0
-        waypoint5.actionRepeatTimes = 1
-        waypoint5.actionTimeoutInSeconds = 60
-        waypoint5.cornerRadiusInMeters = 5
-        waypoint5.turnMode = .clockwise
-        waypoint5.gimbalPitch = 0
-        
-        mission.add(waypoint1)
-        mission.add(waypoint2)
-        mission.add(waypoint3)
-        mission.add(waypoint4)
-        mission.add(waypoint5)
+        for mP in grid {
+            let index = grid.firstIndex(of: mP) ?? 0
+            if index >= 0 { // Later for multiple flights
+                let lat = mP[0]
+                let lon = mP[1]
+                let alt = mP[2]
+                let pitch = mP[3]
+                
+                if CLLocationCoordinate2DIsValid(CLLocationCoordinate2DMake(lat, lon)) && alt < 250 {
+                    
+                    let waypoint = DJIWaypoint(coordinate: CLLocationCoordinate2DMake(lat, lon))
+                    waypoint.altitude = Float(alt)
+                    waypoint.heading = 0
+                    waypoint.actionRepeatTimes = 1
+                    waypoint.actionTimeoutInSeconds = 60
+                    waypoint.cornerRadiusInMeters = 5
+                    waypoint.turnMode = .clockwise
+                    waypoint.gimbalPitch = Float(pitch)
+                    
+                    mission.add(waypoint)
+                }
+            }
+        }
         
         return DJIWaypointMission(mission: mission)
     }
