@@ -3,7 +3,7 @@
 //  DJISDKSwiftDemo
 //
 //  Created by Kilian Eisenegger on 03.12.20.
-//  Copyright © 2020 DJI. All rights reserved.
+//  Copyright © 2020 hdrpano. All rights reserved.
 //
 
 class VirtualSticksController {
@@ -15,9 +15,9 @@ class VirtualSticksController {
         
         DJISDKManager.keyManager()?.setValue(NSNumber(value: enabled), for: virtualStickKey, withCompletion: { (error: Error?) in
             if error != nil {
-                print("Error start virtual stick")
+                NSLog("Error start virtual stick")
             }
-            print("Start virtual stick \(enabled)")
+            NSLog("Start virtual stick \(enabled)")
         })
     }
     
@@ -29,9 +29,9 @@ class VirtualSticksController {
         
         DJISDKManager.keyManager()?.setValue(NSNumber(value: enabled), for: virtualStickKey, withCompletion: { (error: Error?) in
             if error != nil {
-                print("Error start advanced virtual stick")
+                NSLog("Error start advanced virtual stick")
             }
-            print("Start advanced virtual stick \(enabled)")
+            NSLog("Start advanced virtual stick \(enabled)")
         })
     }
     
@@ -43,9 +43,9 @@ class VirtualSticksController {
         
         DJISDKManager.keyManager()?.setValue(NSNumber(value: false), for: virtualStickKey, withCompletion: { (error: Error?) in
             if error != nil {
-                print("Error stop virtual stick")
+                NSLog("Error stop virtual stick")
             }
-            print("Stop virtual stick")
+            NSLog("Stop virtual stick")
         })
     }
     
@@ -57,9 +57,9 @@ class VirtualSticksController {
         
         DJISDKManager.keyManager()?.setValue(NSNumber(value: false), for: virtualStickKey, withCompletion: { (error: Error?) in
             if error != nil {
-                print("Error stop advanced virtual stick")
+                NSLog("Error stop advanced virtual stick")
             }
-            print("Stop advanced virtual stick")
+            NSLog("Stop advanced virtual stick")
         })
     }
     
@@ -74,7 +74,7 @@ class VirtualSticksController {
         }
         
         let vsValue = vs.boolValue
-        print("Virtual Stick on: \(vsValue)")
+        NSLog("Virtual Stick on: \(vsValue)")
         
         return vsValue
     }
@@ -90,7 +90,7 @@ class VirtualSticksController {
         }
         
         let vsValue = vs.boolValue
-        print("Advanced Virtual Stick on: \(vsValue)")
+        NSLog("Advanced Virtual Stick on: \(vsValue)")
         
         return vsValue
     }
@@ -103,14 +103,12 @@ class VirtualSticksController {
         if gimbal != nil {
             gimbal?.rotate(with: rotation, completion: { (error: Error?) in
                 if error != nil {
-                    print("Error rotating gimbal");
+                    NSLog("Error rotating gimbal");
                 }
             })
         }
         if rotationMode == .absoluteAngle {
-            print("Move gimbal absolute with \(yaw) pitch \(pitch)")
-        } else {
-            print("Move gimbal relativ with \(yaw) pitch \(pitch)")
+            NSLog("Move gimbal absolute with \(yaw) pitch \(pitch)")
         }
     }
     
@@ -125,7 +123,7 @@ class VirtualSticksController {
         fc?.send(ctrlData, withCompletion: {
             (error) in
             if let error = error {
-                print("Unable to yaw aircraft \(error)")
+                NSLog("Unable to yaw aircraft \(error)")
             }
         })
     }
@@ -142,7 +140,7 @@ class VirtualSticksController {
         fc?.send(ctrlData, withCompletion: {
             (error) in
             if let error = error {
-                print("Unable to virtual stick aircraft \(error)")
+                NSLog("Unable to virtual stick aircraft \(error)")
             }
         })
     }

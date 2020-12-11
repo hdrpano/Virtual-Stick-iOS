@@ -3,7 +3,7 @@
 //  DJISDKSwiftDemo
 //
 //  Created by Kilian Eisenegger on 10.08.20.
-//  Copyright © 2020 DJI. All rights reserved.
+//  Copyright © 2020 hdrpano. All rights reserved.
 //
 
 class GPS {
@@ -84,4 +84,25 @@ class GPS {
        }
    }
     
+    //MARK:- GPS Coordinate String
+    func coordinateString(_ latitude: Double,_ longitude: Double) -> String {
+        var latSeconds = Int(latitude * 3600)
+        let latDegrees = latSeconds / 3600
+        latSeconds = abs(latSeconds % 3600)
+        let latMinutes = latSeconds / 60
+        latSeconds %= 60
+        var longSeconds = Int(longitude * 3600)
+        let longDegrees = longSeconds / 3600
+        longSeconds = abs(longSeconds % 3600)
+        let longMinutes = longSeconds / 60
+        longSeconds %= 60
+        return String(format:"%d°%d'%d\"%@ %d°%d'%d\"%@",
+                      abs(latDegrees),
+                      latMinutes,
+                      latSeconds, latDegrees >= 0 ? "N" : "S",
+                      abs(longDegrees),
+                      longMinutes,
+                      longSeconds,
+                      longDegrees >= 0 ? "E" : "W" )
+    }
 }

@@ -4,6 +4,7 @@
 //
 //  Created by DJI on 11/13/15.
 //  Copyright © 2015 DJI. All rights reserved.
+//  Modified for Mavic Mini Kilian Eisenegger
 //
 
 import UIKit
@@ -94,11 +95,32 @@ class StartupViewController: UIViewController {
             return;
         }
 
-        //Updates the product's model
+        // Updates the product's model
         self.productModel.text = "Model: \((newProduct.model)!)"
         self.productModel.isHidden = false
         
-        //Updates the product's firmware version - COMING SOON
+        //MARK: Mavic Mini Soft Stitch
+        if newProduct.model == DJIAircraftModelNameMavicMini {
+            let RC = self.fetchRemoteController()
+            if RC != nil {
+                RC?.setSoftSwitchJoyStickMode(._S, completion: { (error: Error?) in
+                if error != nil {
+                        NSLog("Error set for Mini");
+                   }
+                })
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                if RC != nil {
+                    RC?.setSoftSwitchJoyStickMode(._P, completion: { (error: Error?) in
+                    if error != nil {
+                            NSLog("Error set for Mini");
+                       }
+                    })
+                }
+            }
+        }
+        
+        // Updates the product's firmware version - COMING SOON
         newProduct.getFirmwarePackageVersion{ (version:String?, error:Error?) -> Void in
             
             self.productFirmwarePackageVersion.text = "Firmware Package Version: \(version ?? "Unknown")"
@@ -112,7 +134,7 @@ class StartupViewController: UIViewController {
             NSLog("Firmware package version is: \(version ?? "Unknown")")
         }
         
-        //Updates the product's connection status
+        // Updates the product's connection status
         self.productConnectionStatus.text = "Status: Product Connected"
         
         self.openComponents.isEnabled = true;
@@ -126,6 +148,19 @@ class StartupViewController: UIViewController {
         self.openComponents.isEnabled = false;
         self.openComponents.alpha = 0.8;
         NSLog("Product Disconnected")
+    }
+    
+    //MARK: Remote Controller
+    func fetchRemoteController() -> DJIRemoteController? {
+        if DJISDKManager.product() == nil {
+            return nil
+        }
+        
+        if DJISDKManager.product() is DJIAircraft {
+            return (DJISDKManager.product() as! DJIAircraft).remoteController
+        }
+        
+        return nil
     }
     
 }

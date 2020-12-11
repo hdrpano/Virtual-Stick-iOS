@@ -3,12 +3,22 @@
 //  DJISDKSwiftDemo
 //
 //  Created by Kilian Eisenegger on 07.12.20.
-//  Copyright © 2020 DJI. All rights reserved.
+//  Copyright © 2020 hdrpano. All rights reserved.
 //
 
 import DJISDK
 
 class CameraController {
+    //MARK: Set Camera Mode
+    func setCameraMode(cameraMode: DJICameraMode = .shootPhoto) {
+        let camera = self.fetchCamera()
+        camera?.setMode(cameraMode, withCompletion: { (error: Error?) in
+            if error != nil {
+                NSLog("Error set mode photo/video");
+            }
+        })
+    }
+    
     //MARK:- Get SD Card Count
     func getSDPhotoCount() -> Int {
         guard let sdCountKey = DJICameraKey(param: DJICameraParamSDCardAvailablePhotoCount) else {
@@ -22,12 +32,75 @@ class CameraController {
     }
     
     //MARK:- Start Shoot Photo
-    func shootPhoto() {
+    func startShootPhoto() {
         let camera = self.fetchCamera()
         if camera != nil {
             camera?.startShootPhoto(completion:{ (error: Error?) in
                 if error != nil {
-                    print("Error shooting photo")
+                    NSLog("Error shooting photo")
+                }
+            })
+        }
+    }
+    
+    //MARK:- Stop Shoot Photo
+    func stopShootPhoto() {
+        let camera = self.fetchCamera()
+        if camera != nil {
+            camera?.stopShootPhoto(completion:{ (error: Error?) in
+                if error != nil {
+                    NSLog("Error stop shooting photo")
+                }
+            })
+        }
+    }
+    
+    //MARK:- Start Shoot Photo
+    func startRecordVideo() {
+        let camera = self.fetchCamera()
+        if camera != nil {
+            camera?.startRecordVideo(completion:{ (error: Error?) in
+                if error != nil {
+                    NSLog("Error recording video")
+                }
+            })
+        }
+    }
+    
+    //MARK:- Stop Shoot Photo
+    func stopRecordVideo() {
+        let camera = self.fetchCamera()
+        if camera != nil {
+            camera?.stopRecordVideo(completion:{ (error: Error?) in
+                if error != nil {
+                    NSLog("Error stop recording video")
+                }
+            })
+        }
+    }
+    
+    //MARK:- Set Shoot Mode Single AEB ...
+    func setShootMode(shootMode: DJICameraShootPhotoMode = .single) {
+        let camera = self.fetchCamera()
+        if camera != nil {
+            camera?.setShootPhotoMode(shootMode, withCompletion: { (error: Error?) in
+                if error != nil {
+                    NSLog("Error set camera shoot mode .single .AEB .panorama .hyperLight");
+                }
+            })
+        }
+    }
+    
+    //MARK:- Set Time Intervall
+    func setTimeIntervall(interval: UInt16 = 2, count: UInt8 = 255) {
+        let camera = self.fetchCamera()
+        var settings = DJICameraPhotoTimeIntervalSettings()
+        settings.captureCount = count
+        settings.timeIntervalInSeconds = interval
+        if camera != nil {
+            camera?.setPhotoTimeIntervalSettings(settings, withCompletion: { (error: Error?) in
+                if error != nil {
+                    NSLog("Error set time interval and count");
                 }
             })
         }

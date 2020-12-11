@@ -4,6 +4,7 @@
 //
 //  Created by Arnaud Thiercelin on 3/22/17.
 //  Copyright © 2017 DJI. All rights reserved.
+//  Optimized waypoint mission in Array (C) Kilian Eisenegger 2020
 //
 
 import UIKit
@@ -429,6 +430,7 @@ class TimelineMissionViewController: UIViewController, UICollectionViewDelegate,
                     waypoint.gimbalPitch = Float(pitch)
                     
                     mission.add(waypoint)
+                
                 }
             }
         }
@@ -468,8 +470,7 @@ class TimelineMissionViewController: UIViewController, UICollectionViewDelegate,
         return DJIHotpointAction(mission: mission, surroundingAngle: 180)
     }
     
-    // MARK: - Convenience
-    
+    // MARK:- Convenience
     func degreesToRadians(_ degrees: Double) -> Double {
         return Double.pi / 180 * degrees
     }
