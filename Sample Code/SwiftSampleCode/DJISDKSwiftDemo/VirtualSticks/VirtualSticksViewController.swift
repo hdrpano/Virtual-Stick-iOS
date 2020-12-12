@@ -18,6 +18,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     @IBOutlet weak var gimbalPitchLabel: UILabel!
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var missionButton: UIButton!
+    @IBOutlet weak var speedLabel: UILabel!
     
     var homeAnnotation = DJIImageAnnotation(identifier: "homeAnnotation")
     var aircraftAnnotation = DJIImageAnnotation(identifier: "aircraftAnnotation")
@@ -58,7 +59,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var vsSpeed: Float = 0
     var sdCardCount: Int = 0
     var photoCount: Int = 0
-    // var photoCount: Int = 0
     var GPSController = GPS()
     var vsController = VirtualSticksController()
     var camController = CameraController()
@@ -185,8 +185,9 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                         if !self.GCDvs {
                             let distance = gps.getDistanceBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
                             let bearing = gps.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
-                            self.distanceLabel.text = String((distance*10).rounded()/10) + " m"
-                            self.bearingLabel.text = String((bearing*10).rounded()/10) + " m"
+                            if distance != 0 {self.distanceLabel.text = String((distance*10).rounded()/10) + " m"}
+                            if bearing != 0 {self.bearingLabel.text = String((bearing*10).rounded()/10) + " m"}
+                            if self.vsSpeed != 0 {self.speedLabel.text = String((self.vsSpeed*10).rounded()/10) + " m/s"}
                         }
                     }
                 }
@@ -212,9 +213,9 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             DJISDKManager.keyManager()?.startListeningForChanges(on: aircraftAttitudeKey, withListener: self , andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
                 if newValue != nil {
                     let Vector = newValue!.value as! DJISDKVector3D // Double in degrees
-                    self.xLabel.text = String((Vector.x*10).rounded()/10)
-                    self.yLabel.text = String((Vector.y*10).rounded()/10)
-                    self.zLabel.text = String((Vector.z*10).rounded()/10)
+                    if Vector.x != 0 {self.xLabel.text = String((Vector.x*10).rounded()/10)}
+                    if Vector.y != 0 {self.yLabel.text = String((Vector.y*10).rounded()/10)}
+                    if Vector.z != 0 {self.zLabel.text = String((Vector.z*10).rounded()/10)}
                     self.aircraftHeading = Vector.z
                 }
             })
@@ -239,7 +240,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
 
                     let nsvalue = newValue!.value as! NSValue
                     nsvalue.getValue(&gimbalAttitude)
-                    self.gimbalPitchLabel.text = String((gimbalAttitude.pitch*10).rounded()/10) + " °"
+                    if gimbalAttitude.pitch != 0 {self.gimbalPitchLabel.text = String((gimbalAttitude.pitch*10).rounded()/10) + " °"}
                     self.gimbalPitch = Double(gimbalAttitude.pitch)
                 }
             })
@@ -249,7 +250,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         if let altitudeKey = DJIFlightControllerKey(param: DJIFlightControllerParamAltitudeInMeters) {
            DJISDKManager.keyManager()?.startListeningForChanges(on: altitudeKey, withListener: self , andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
                 if (newValue != nil) {
-                    self.altitudeLabel.text = String((newValue!.doubleValue*10).rounded()/10) + " m"
+                    if newValue!.doubleValue != 0 {self.altitudeLabel.text = String((newValue!.doubleValue*10).rounded()/10) + " m"}
                     self.aircraftAltitude = newValue!.doubleValue
                 }
             })
@@ -286,7 +287,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         let distance = self.GPSController.getDistanceBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         
         self.bearingLabel.text = String((bearing*10).rounded()/10) + " m"
-        self.distanceLabel.text = String((distance*10).rounded()/10) + " m"
         
         // Slow down the aircraft
         if distance <= Double(self.vsSpeed) {
@@ -400,7 +400,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     //MARK: Start 2D Virtual Stick Mission
     func startVSLinearNow() {
         var grid: Array = [[Double]]()
-        let distance: Double = 50
+        let distance: Double = 30
         let speed: Float = min(Float(distance) / 7, 4)
         self.vsSpeed = speed
         let aircraftLocationStart:CLLocationCoordinate2D = self.aircraftLocation
