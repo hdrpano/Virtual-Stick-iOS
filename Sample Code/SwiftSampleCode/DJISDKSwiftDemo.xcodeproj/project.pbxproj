@@ -235,7 +235,7 @@
 		86985CC11E834EC200577EC7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				CLASSPREFIX = hdrpano;
+				CLASSPREFIX = "";
 				LastSwiftUpdateCheck = 0820;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = DJI;
