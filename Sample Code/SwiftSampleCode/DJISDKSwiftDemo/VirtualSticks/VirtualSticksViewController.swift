@@ -396,9 +396,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     }
     
     func stopVS() {
-        if self.camController.getShootMode() == .interval {
-            self.camController.stopShootPhoto()
-        }
+        self.camController.stopShootPhoto()
         if !self.GCDphoto { self.GCDphoto = true ; self.photoDispatchGroup.leave() }
         if !self.GCDgimbal { self.GCDgimbal = true; self.gimbalDispatchGroup.leave() }
         if !self.GCDaircraftYaw { self.GCDaircraftYaw = true; self.yawDispatchGroup.leave() }
