@@ -515,7 +515,7 @@
 					"$(PROJECT_DIR)/../DJIWidget",
 					"\"$(SRCROOT)/../DJIWidget/FFmpeg\"",
 				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = "$(PODS_ROOT)/Headers/Public";
 				INFOPLIST_FILE = "$(SRCROOT)/DJISDKSwiftDemo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -544,7 +544,7 @@
 					"$(PROJECT_DIR)/../DJIWidget",
 					"\"$(SRCROOT)/../DJIWidget/FFmpeg\"",
 				);
-				HEADER_SEARCH_PATHS = "$(inherited)";
+				HEADER_SEARCH_PATHS = "$(PODS_ROOT)/Headers/Public";
 				INFOPLIST_FILE = "$(SRCROOT)/DJISDKSwiftDemo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (

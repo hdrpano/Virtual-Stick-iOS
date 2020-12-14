@@ -91,6 +91,21 @@ class CameraController {
         }
     }
     
+    func getShootMode() -> DJICameraShootPhotoMode {
+        var shootMode: DJICameraShootPhotoMode = .single
+        let camera = self.fetchCamera()
+        if camera != nil {
+            camera?.getShootPhotoMode(completion: {(mode, error: Error?) in
+                if error != nil {
+                    print("Get shoot mode error");
+                }
+                shootMode = mode //Int(mode.rawValue) as Int
+                print("Get shoot mode \(mode) \(mode.rawValue)")
+            })
+        }
+        return shootMode
+    }
+    
     //MARK:- Set Time Intervall
     func setTimeIntervall(interval: UInt16 = 2, count: UInt8 = 255) {
         let camera = self.fetchCamera()

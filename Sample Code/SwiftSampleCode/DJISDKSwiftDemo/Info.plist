@@ -22,6 +22,11 @@
 	<string>fa72b338c1bd2e72d557655b</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Bluetooth is used for connection</string>
 	<key>UILaunchStoryboardName</key>
@@ -49,6 +54,7 @@
 		<string>com.dji.video</string>
 		<string>com.dji.protocol</string>
 		<string>com.dji.common</string>
+		<string>com.dji.logiclink</string>
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
