@@ -402,12 +402,13 @@ class TimelineMissionViewController: UIViewController, UICollectionViewDelegate,
         }
         
         mission.pointOfInterest = droneCoordinates
-        let offset = 0.00000899321605956683 * 10 // 10m 0.00000899321605956683
+        let offsety: Double = 0.00000899321605956683 * 10 // 10m 0.00000899321605956683
+        let offsetx: Double = offsety * cos(droneCoordinates.latitude * .pi / 180)
         
-        grid = [[droneCoordinates.latitude + offset / 4, droneCoordinates.longitude + offset / 2, 25, 0],
-                [droneCoordinates.latitude + offset / 4, droneCoordinates.longitude - offset / 2, 26, -90],
-                [droneCoordinates.latitude - offset / 4, droneCoordinates.longitude - offset / 2, 27, 0],
-                [droneCoordinates.latitude - offset / 4, droneCoordinates.longitude + offset / 2, 28, -90],
+        grid = [[droneCoordinates.latitude + offsety / 2, droneCoordinates.longitude + offsetx / 2, 25, 0],
+                [droneCoordinates.latitude + offsety / 2, droneCoordinates.longitude - offsetx / 2, 26, -90],
+                [droneCoordinates.latitude - offsety / 2, droneCoordinates.longitude - offsetx / 2, 27, 0],
+                [droneCoordinates.latitude - offsety / 2, droneCoordinates.longitude + offsetx / 2, 28, -90],
                 [droneCoordinates.latitude, droneCoordinates.longitude, 25, 0]]
         
         for mP in grid {

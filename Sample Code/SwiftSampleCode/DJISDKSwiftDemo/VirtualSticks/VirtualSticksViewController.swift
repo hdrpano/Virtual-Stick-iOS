@@ -32,11 +32,12 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var queue = DispatchQueue(label: "com.virtual.myqueue")
     var photoDispatchGroup = DispatchGroup()
     var aircraftDispatchGroup = DispatchGroup()
+    var yawDispatchGroup = DispatchGroup()
     var gimbalDispatchGroup = DispatchGroup()
-    var GCDaircraft: Bool = true
+    var GCDaircraftYaw: Bool = true
     var GCDphoto: Bool = true
     var GCDgimbal: Bool = true
-    var GCDvs: Bool = false
+    var GCDvs: Bool = true
     var GCDProcess: Bool = false
     
     //MARK: GPS Variables
@@ -52,13 +53,14 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var targetGimbalYaw: Double = 0
     var gimbalPitch: Double = 0
     let start = Date()
-    var GCDaircraftFT: Double = 0
+    var GCDaircraftYawFT: Double = 0
     var GCDgimbalFT: Double = 0
     var GCDvsFT: Double = 0
     var GCDphotoFT: Double = 0
     var vsSpeed: Float = 0
     var sdCardCount: Int = 0
     var photoCount: Int = 0
+    var bracketing: Int = 1
     var GPSController = GPS()
     var vsController = VirtualSticksController()
     var camController = CameraController()
@@ -127,7 +129,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     
     //MARK: GCD Timer Dispatch Management
     @objc func updateGCD() {
-        if !self.GCDaircraft  { self.showAircraftYaw() }
+        if !self.GCDaircraftYaw  { self.showAircraftYaw() }
         if !self.GCDgimbal  { self.showGimbal() }
         if !self.GCDphoto  { self.showPhoto() }
         if !self.GCDvs { self.showVS() }
@@ -135,11 +137,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     
     //MARK: Virtual Stick Yaw Aircraft
     func yawAircraft() {
-        self.aircraftDispatchGroup.enter()
-        self.GCDaircraft = false
-        self.GCDaircraftFT = self.start.timeIntervalSinceNow * -1
-        self.vsController.vsYaw(yaw: Float(self.targetAircraftYaw))
-        self.aircraftDispatchGroup.wait()
+        self.yawDispatchGroup.enter()
+        self.GCDaircraftYaw = false
+        self.GCDaircraftYawFT = self.start.timeIntervalSinceNow * -1
+        self.yawDispatchGroup.wait()
     }
     
     //MARK: Virtual Stick Move Aircraft
@@ -185,9 +186,13 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                         if !self.GCDvs {
                             let distance = gps.getDistanceBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
                             let bearing = gps.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
-                            if distance != 0 {self.distanceLabel.text = String((distance*10).rounded()/10) + " m"}
-                            if bearing != 0 {self.bearingLabel.text = String((bearing*10).rounded()/10) + " m"}
-                            if self.vsSpeed != 0 {self.speedLabel.text = String((self.vsSpeed*10).rounded()/10) + " m/s"}
+                            if distance < 1000 {self.distanceLabel.text = String((distance*10).rounded()/10) + "m"}
+                            self.bearingLabel.text = String((bearing*10).rounded()/10) + " °"
+                            if self.vsSpeed != 0 {self.speedLabel.text = String((self.vsSpeed*10).rounded()/10) + "m/s"}
+                            
+                            let viewRegion = MKCoordinateRegion(center: self.aircraftLocation, latitudinalMeters: 100, longitudinalMeters: 100)
+                            self.mapView.setRegion(viewRegion, animated: true)
+                            self.mapView.setNeedsDisplay()
                         }
                     }
                 }
@@ -198,7 +203,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     let newLocationValue = value!.value as! CLLocation
                     if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
                         self.aircraftLocation = newLocationValue.coordinate
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                             let viewRegion = MKCoordinateRegion(center: self.aircraftLocation, latitudinalMeters: 200, longitudinalMeters: 200)
                             self.mapView.setRegion(viewRegion, animated: true)
                             self.mapView.setNeedsDisplay()
@@ -213,24 +218,29 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             DJISDKManager.keyManager()?.startListeningForChanges(on: aircraftAttitudeKey, withListener: self , andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
                 if newValue != nil {
                     let Vector = newValue!.value as! DJISDKVector3D // Double in degrees
-                    if Vector.x != 0 {self.xLabel.text = String((Vector.x*10).rounded()/10)}
-                    if Vector.y != 0 {self.yLabel.text = String((Vector.y*10).rounded()/10)}
-                    if Vector.z != 0 {self.zLabel.text = String((Vector.z*10).rounded()/10)}
+                    self.xLabel.text = String((Vector.x*10).rounded()/10) + "°"
+                    self.yLabel.text = String((Vector.y*10).rounded()/10) + "°"
+                    self.zLabel.text = String((Vector.z*10).rounded()/10) + "°"
                     self.aircraftHeading = Vector.z
+                    self.aircraftAnnotation.heading = Vector.z
+                    if (self.aircraftAnnotationView != nil) {
+                        self.aircraftAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat(self.degreesToRadians(Double(self.aircraftAnnotation.heading))))
+                    }
                 }
             })
         }
         
-        if let aircraftHeadingKey = DJIFlightControllerKey(param: DJIFlightControllerParamCompassHeading) {
+        /* if let aircraftHeadingKey = DJIFlightControllerKey(param: DJIFlightControllerParamCompassHeading) {
             DJISDKManager.keyManager()?.startListeningForChanges(on: aircraftHeadingKey, withListener: self) { [unowned self] (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
                 if (newValue != nil) {
                     self.aircraftAnnotation.heading = newValue!.doubleValue
+                    self.aircraftHeading = newValue!.doubleValue
                     if (self.aircraftAnnotationView != nil) {
                         self.aircraftAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat(self.degreesToRadians(Double(self.aircraftAnnotation.heading))))
                     }
                 }
             }
-        }
+        } */
         
         //MARK: Gimbal Attitude Listener
         if let gimbalAttitudeKey = DJIGimbalKey(param: DJIGimbalParamAttitudeInDegrees) {
@@ -240,7 +250,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
 
                     let nsvalue = newValue!.value as! NSValue
                     nsvalue.getValue(&gimbalAttitude)
-                    if gimbalAttitude.pitch != 0 {self.gimbalPitchLabel.text = String((gimbalAttitude.pitch*10).rounded()/10) + " °"}
+                    self.gimbalPitchLabel.text = String((gimbalAttitude.pitch*10).rounded()/10) + "°"
                     self.gimbalPitch = Double(gimbalAttitude.pitch)
                 }
             })
@@ -250,7 +260,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         if let altitudeKey = DJIFlightControllerKey(param: DJIFlightControllerParamAltitudeInMeters) {
            DJISDKManager.keyManager()?.startListeningForChanges(on: altitudeKey, withListener: self , andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
                 if (newValue != nil) {
-                    if newValue!.doubleValue != 0 {self.altitudeLabel.text = String((newValue!.doubleValue*10).rounded()/10) + " m"}
+                    self.altitudeLabel.text = String((newValue!.doubleValue*10).rounded()/10) + "m"
                     self.aircraftAltitude = newValue!.doubleValue
                 }
             })
@@ -274,6 +284,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         if let sdCountKey = DJICameraKey(param: DJICameraParamSDCardAvailablePhotoCount) {
             DJISDKManager.keyManager()?.startListeningForChanges(on: sdCountKey, withListener: self , andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
                 if newValue != nil {
+                    self.photoCount += 1
                     self.missionButton.setTitle("Photo count \(self.photoCount)", for: .normal)
                 }
             })
@@ -285,8 +296,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         // let time = self.start.timeIntervalSinceNow * -1 - self.GCDvsFT // for timeout GCD
         let bearing = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         let distance = self.GPSController.getDistanceBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
-        
-        self.bearingLabel.text = String((bearing*10).rounded()/10) + " m"
         
         // Slow down the aircraft
         if distance <= Double(self.vsSpeed) {
@@ -301,7 +310,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         // Turn heading
         if self.aircraftHeading != bearing {
             self.vsTargetBearing = bearing
-            if self.aircraftHeading - bearing > 1 {
+            if abs(self.aircraftHeading - bearing) > 1 {
                 print("Move correct heading \((self.aircraftHeading*10).rounded()/10) \(Int(self.vsTargetBearing))")
             }
         }
@@ -315,7 +324,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(self.vsTargetBearing), vertical: Float(self.vsTargetAltitude))
         
         // We reach the waypoint
-        if distance < 1.1 && self.aircraftAltitude - self.vsTargetAltitude < 1.1 {
+        if distance < 0.5 && self.aircraftAltitude - self.vsTargetAltitude < 0.5 {
             self.GCDvs = true
             print("VS Mission step complete")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -326,24 +335,24 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     
     //MARK: Show Aircraft Yaw Action
     func showAircraftYaw() {
-        let time = self.start.timeIntervalSinceNow * -1 - self.GCDaircraftFT
-        if !self.GCDaircraft && time > 0.9 {
+        let time = self.start.timeIntervalSinceNow * -1 - self.GCDaircraftYawFT
+        if !self.GCDaircraftYaw {
             var diff: Double = abs(self.self.aircraftHeading - self.targetAircraftYaw)
             if diff >= 180 { diff = abs(diff - 360) }
             if diff < 2 { // 1.5° - 3°
                 print("Aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
-                self.GCDaircraft = true
+                self.GCDaircraftYaw = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                    self.aircraftDispatchGroup.leave()
+                    self.yawDispatchGroup.leave()
                 }
             } else {
                 print("Wait on aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
                 self.vsController.vsYaw(yaw: Float(self.targetAircraftYaw)) // repeat between 5 and 20Hz perfect with the listener
             }
             // Timeout call
-            if time > 5 && !self.GCDaircraft {
-                self.aircraftDispatchGroup.leave()
-                self.GCDaircraft = true
+            if time > 5 {
+                self.GCDaircraftYaw = true
+                self.yawDispatchGroup.leave()
                 print("Timeout on aircraft yaw!")
             }
         }
@@ -387,10 +396,13 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     }
     
     func stopVS() {
-        if !self.GCDphoto { self.photoDispatchGroup.leave(); self.GCDphoto = false }
-        if !self.GCDgimbal { self.gimbalDispatchGroup.leave(); self.GCDgimbal = false }
-        if !self.GCDaircraft { self.aircraftDispatchGroup.leave(); self.GCDaircraft = false }
-        if !self.GCDvs { self.aircraftDispatchGroup.leave(); self.GCDvs = false }
+        if self.camController.getShootMode() == .interval {
+            self.camController.stopShootPhoto()
+        }
+        if !self.GCDphoto { self.GCDphoto = true ; self.photoDispatchGroup.leave() }
+        if !self.GCDgimbal { self.GCDgimbal = true; self.gimbalDispatchGroup.leave() }
+        if !self.GCDaircraftYaw { self.GCDaircraftYaw = true; self.yawDispatchGroup.leave() }
+        if !self.GCDvs { self.GCDvs = true; self.aircraftDispatchGroup.leave() }
         if self.vsController.isVirtualStick() { self.vsController.stopVirtualStick() }
         if self.vsController.isVirtualStickAdvanced() { self.vsController.stopAdvancedVirtualStick() }
         self.GCDProcess = false
@@ -400,18 +412,18 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     //MARK: Start 2D Virtual Stick Mission
     func startVSLinearNow() {
         var grid: Array = [[Double]]()
-        let distance: Double = 30
+        let distance: Double = 50
         let speed: Float = min(Float(distance) / 7, 4)
         self.vsSpeed = speed
         let aircraftLocationStart:CLLocationCoordinate2D = self.aircraftLocation
         let altitude: Double = max(self.aircraftAltitude, 10)
         let pitch: Double = -90
-        let offset: Double = 0.00000899321605956683 * distance // 10m 0.00000899321605956683
+        let offsety: Double = 0.00000899321605956683 * distance
+        let offsetx: Double = offsety / cos(aircraftLocationStart.latitude * .pi / 180)
 
         self.timer = Timer.scheduledTimer(timeInterval: 0.05, target: self, selector: #selector(updateGCD), userInfo: nil, repeats: true)
         self.sdCardCount = self.camController.getSDPhotoCount()
         self.photoCount = 0
-        self.GCDvs = true
         self.GCDProcess = true
         
         if !self.vsController.isVirtualStick() { self.vsController.startVirtualStick() }
@@ -419,21 +431,35 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         
         self.deleteAnnotations()
         self.camController.setCameraMode(cameraMode: .shootPhoto)
-        self.camController.setShootMode(shootMode: .single)
         self.missionButton.setTitleColor(UIColor.red, for: .normal)
+        self.missionButton.setTitle("Fly VS Mission...", for: .normal)
         
-        grid = [[aircraftLocationStart.latitude + offset / 4, aircraftLocationStart.longitude + offset / 2, altitude, pitch, 1],
-                [aircraftLocationStart.latitude + offset / 4, aircraftLocationStart.longitude - offset / 2, altitude, pitch, 1],
-                [aircraftLocationStart.latitude - offset / 4, aircraftLocationStart.longitude - offset / 2, altitude, pitch, 1],
-                [aircraftLocationStart.latitude - offset / 4, aircraftLocationStart.longitude + offset / 2, altitude, pitch, 1],
-                [aircraftLocationStart.latitude, aircraftLocationStart.longitude, altitude, pitch, 1]]
+        // Pseudo Mission array
+        grid = [[aircraftLocationStart.latitude + offsety / 2, aircraftLocationStart.longitude + offsetx / 2, altitude + 2, pitch, 1],
+                [aircraftLocationStart.latitude + offsety / 2, aircraftLocationStart.longitude - offsetx / 2, altitude + 4, pitch, 1],
+                [aircraftLocationStart.latitude - offsety / 2, aircraftLocationStart.longitude - offsetx / 2, altitude + 6, pitch, 1],
+                [aircraftLocationStart.latitude - offsety / 2, aircraftLocationStart.longitude + offsetx / 2, altitude + 8, pitch, 1],
+                [aircraftLocationStart.latitude, aircraftLocationStart.longitude, altitude, 0, 1]]
         
         self.addWaypoints(grid: grid)
         
-        self.queue.asyncAfter(deadline: .now() + 1.0) {
-            self.targetGimbalPitch = -90
-            self.moveGimbal()
+        // Virtual Stick Missions works with AEB or else
+        switch grid[0][4] {
+        case 1:
+            self.camController.setShootMode(shootMode: .single)
+        case 2:
+            self.camController.setShootMode(shootMode: .AEB)
+        case 3:
+            self.camController.setShootMode(shootMode: .hyperLight)
+        case 4:
+            self.camController.setShootMode(shootMode: .interval)
+            self.camController.setTimeIntervall(interval: 2, count: 255)
+        default:
+            self.camController.setShootMode(shootMode: .single)
+        }
             
+        self.queue.asyncAfter(deadline: .now() + 1.0) {
+
             for mP in grid {
                 let index = grid.firstIndex(of: mP) ?? 0
                 if index >= 0 { // Later for multiple flights
@@ -441,11 +467,13 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     let lon = mP[1]
                     let alt = mP[2]
                     let pitch = mP[3]
-                    let action = mP[4] // 1 single photo, 2 AEB3 photo, 3 AEB5 photo, 4 hyperlight
+                    let action = mP[4]
                     // let curve = mP[5]
                     // let POIlat = mP[6]
                     // let POIlon = mP[7]
-                    
+                    if action == 4 {
+                        self.camController.startShootPhoto() // For .intervall photos
+                    }
                     
                     if CLLocationCoordinate2DIsValid(CLLocationCoordinate2DMake(lat, lon)) && alt < 250 {
         
@@ -453,27 +481,25 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                         self.vsTargetLocation.longitude = lon
                         self.vsTargetAltitude = alt
                         self.targetGimbalPitch = pitch
+                        self.targetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
                         
                         self.moveGimbal()
+                        if self.GCDProcess == false { break } // Exit point for dispatch group
                         
-                        let bearing:Float = Float(self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation))
-                        
-                        if abs(Float(self.aircraftHeading) - bearing) > 14 {
-                            self.targetAircraftYaw = Double(bearing)
+                        if abs(self.aircraftHeading - self.targetAircraftYaw) > 5 {
                             self.yawAircraft()
+                            if self.GCDProcess == false { break } // Exit point for dispatch group
                         }
                         
-                        print("VS move")
                         self.vsSpeed = speed
                         self.moveAircraft()
-                        if self.GCDProcess == false { break }
+                        if self.GCDProcess == false { break } // Exit point for dispatch group
                         
                         if index < grid.count - 1 && action == 1 {
                             print("Photo \(index) \(grid.count)")
-                            self.photoCount += 1
                             self.takePhoto()
                             self.sdCardCount = self.camController.getSDPhotoCount()
-                            if self.GCDProcess == false { break }
+                            if self.GCDProcess == false { break } // Exit point for dispatch group
                         }
                     
                     }
@@ -481,8 +507,11 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             }
             
             print("Stop VS")
+            if grid[0][4] == 4 {
+                self.camController.stopShootPhoto()
+            }
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.stopVS()
+                if self.GCDProcess { self.stopVS() }
                 self.missionButton.setTitleColor(UIColor.white, for: .normal)
                 self.missionButton.setTitle("GPS Fly VS Mission", for: .normal)
             }
@@ -532,6 +561,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             }
             
             annotationView?.image = image
+            // annotationView?.centerOffset = CGPoint(x: -17.5, y: -17.5)
             
             if annotation.isEqual(self.aircraftAnnotation) {
                 if annotationView != nil {
@@ -557,6 +587,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         }
     }
     
+    //MARK: Add Annotations
     func addWaypoints(grid: [[Double]]) {
         for mP in grid {
            
@@ -583,8 +614,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
 //MARK: Remote Controller Delegate
 extension VirtualSticksViewController: DJIRemoteControllerDelegate {
     func remoteController(_ remoteController: DJIRemoteController, didUpdate  state: DJIRCHardwareState) {
-        if self.GCDvs && (state.leftStick.verticalPosition != 0 || state.rightStick.verticalPosition != 0) {
-            NSLog("Stop VS")
+        if self.GCDProcess && (state.leftStick.verticalPosition != 0 || (state.leftStick.horizontalPosition != 0 || state.rightStick.verticalPosition != 0 || state.rightStick.horizontalPosition != 0) || state.goHomeButton.isClicked.boolValue) {
+            self.GCDProcess = false
+            NSLog("Stop VS \(state.leftStick) \(state.rightStick)")
+            self.missionButton.setTitle("VS Remote Interrupt", for: .normal)
             self.stopVS()
         }
     }
