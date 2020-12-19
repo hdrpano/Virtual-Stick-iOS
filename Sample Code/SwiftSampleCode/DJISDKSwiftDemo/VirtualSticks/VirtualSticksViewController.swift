@@ -20,6 +20,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     @IBOutlet weak var missionButton: UIButton!
     @IBOutlet weak var speedLabel: UILabel!
     
+    //MARK: MKMapView
     var homeAnnotation = DJIImageAnnotation(identifier: "homeAnnotation")
     var aircraftAnnotation = DJIImageAnnotation(identifier: "aircraftAnnotation")
     var waypointAnnotation = DJIImageAnnotation(identifier: "waypointAnnotation")
@@ -39,6 +40,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var GCDgimbal: Bool = true
     var GCDvs: Bool = true
     var GCDProcess: Bool = false
+    var GCDaircraftYawFT: Double = 0
+    var GCDgimbalFT: Double = 0
+    var GCDvsFT: Double = 0
+    var GCDphotoFT: Double = 0
     
     //MARK: GPS Variables
     var aircraftLocation: CLLocationCoordinate2D = kCLLocationCoordinate2DInvalid
@@ -53,14 +58,12 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var targetGimbalYaw: Double = 0
     var gimbalPitch: Double = 0
     let start = Date()
-    var GCDaircraftYawFT: Double = 0
-    var GCDgimbalFT: Double = 0
-    var GCDvsFT: Double = 0
-    var GCDphotoFT: Double = 0
     var vsSpeed: Float = 0
     var sdCardCount: Int = 0
     var photoCount: Int = 0
     var bracketing: Int = 1
+    var nearTargetDistance: Double = 0.5
+    
     var GPSController = GPS()
     var vsController = VirtualSticksController()
     var camController = CameraController()
@@ -81,14 +84,17 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         // Grab a reference to the aircraft
         if let aircraft = DJISDKManager.product() as? DJIAircraft {
             
+            // Debug Virtual Stick if it still on
+            if self.vsController.isVirtualStick() { self.vsController.stopVirtualStick() }
+            if self.vsController.isVirtualStickAdvanced() { self.vsController.stopAdvancedVirtualStick() }
+            
             // Grab a reference to the flight controller
             if let fc = aircraft.flightController {
                 
                 // Store the flightController
                 self.flightController = fc
                 
-                // stop Virtual Stick if somebody touches the sticks
-                // We get into real Pro stuff with this (C) Kilian Eisenegger
+                // Stop Virtual Stick if somebody touches the sticks
                 let rc = aircraft.remoteController
                 if rc != nil {
                     rc?.delegate = self
@@ -230,18 +236,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             })
         }
         
-        /* if let aircraftHeadingKey = DJIFlightControllerKey(param: DJIFlightControllerParamCompassHeading) {
-            DJISDKManager.keyManager()?.startListeningForChanges(on: aircraftHeadingKey, withListener: self) { [unowned self] (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
-                if (newValue != nil) {
-                    self.aircraftAnnotation.heading = newValue!.doubleValue
-                    self.aircraftHeading = newValue!.doubleValue
-                    if (self.aircraftAnnotationView != nil) {
-                        self.aircraftAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat(self.degreesToRadians(Double(self.aircraftAnnotation.heading))))
-                    }
-                }
-            }
-        } */
-        
         //MARK: Gimbal Attitude Listener
         if let gimbalAttitudeKey = DJIGimbalKey(param: DJIGimbalParamAttitudeInDegrees) {
             DJISDKManager.keyManager()?.startListeningForChanges(on: gimbalAttitudeKey, withListener: self , andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
@@ -293,7 +287,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         
     //MARK: Show Virtual Stick Move Action
     func showVS() {
-        // let time = self.start.timeIntervalSinceNow * -1 - self.GCDvsFT // for timeout GCD
         let bearing = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         let distance = self.GPSController.getDistanceBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         
@@ -316,7 +309,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         }
         
         // Move to the target altitude
-        if self.aircraftAltitude - self.vsTargetAltitude > 1 {
+        if self.aircraftAltitude - self.vsTargetAltitude > self.nearTargetDistance {
             print("Move vertical \(Int(self.aircraftAltitude)) target [\(Int(self.vsTargetAltitude))")
         }
         
@@ -324,7 +317,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(self.vsTargetBearing), vertical: Float(self.vsTargetAltitude))
         
         // We reach the waypoint
-        if distance < 0.5 && self.aircraftAltitude - self.vsTargetAltitude < 0.5 {
+        if distance < self.nearTargetDistance && self.aircraftAltitude - self.vsTargetAltitude < self.nearTargetDistance {
             self.GCDvs = true
             print("VS Mission step complete")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -396,6 +389,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     }
     
     func stopVS() {
+        self.GCDProcess = false
         self.camController.stopShootPhoto()
         if !self.GCDphoto { self.GCDphoto = true ; self.photoDispatchGroup.leave() }
         if !self.GCDgimbal { self.GCDgimbal = true; self.gimbalDispatchGroup.leave() }
@@ -403,7 +397,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         if !self.GCDvs { self.GCDvs = true; self.aircraftDispatchGroup.leave() }
         if self.vsController.isVirtualStick() { self.vsController.stopVirtualStick() }
         if self.vsController.isVirtualStickAdvanced() { self.vsController.stopAdvancedVirtualStick() }
-        self.GCDProcess = false
         if self.timer != nil { self.timer?.invalidate() }
     }
     
@@ -613,7 +606,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
 extension VirtualSticksViewController: DJIRemoteControllerDelegate {
     func remoteController(_ remoteController: DJIRemoteController, didUpdate  state: DJIRCHardwareState) {
         if self.GCDProcess && (state.leftStick.verticalPosition != 0 || (state.leftStick.horizontalPosition != 0 || state.rightStick.verticalPosition != 0 || state.rightStick.horizontalPosition != 0) || state.goHomeButton.isClicked.boolValue) {
-            self.GCDProcess = false
             NSLog("Stop VS \(state.leftStick) \(state.rightStick)")
             self.missionButton.setTitle("VS Remote Interrupt", for: .normal)
             self.stopVS()
