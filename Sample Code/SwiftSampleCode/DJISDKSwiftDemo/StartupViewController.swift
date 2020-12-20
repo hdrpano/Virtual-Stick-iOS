@@ -58,6 +58,19 @@ class StartupViewController: UIViewController {
                 }
             })
         }
+        
+        if let homeLocationKey = DJIFlightControllerKey(param: DJIFlightControllerParamHomeLocation)  {
+            DJISDKManager.keyManager()?.startListeningForChanges(on: homeLocationKey, withListener: self, andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
+                if newValue != nil {
+                    let newLocationValue = newValue!.value as! CLLocation
+                    
+                    if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+                        let homeLocation = newLocationValue.coordinate  // we need that for Airmap
+                        NSLog("Home location set \(homeLocation)")
+                    }
+                }
+            })
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {

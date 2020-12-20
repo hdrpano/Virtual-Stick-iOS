@@ -145,6 +145,23 @@ class VirtualSticksController {
         })
     }
     
+    //MARK: Front LEDs On Off
+    func frontLed(frontLEDs: Bool) {
+        let FC = self.fetchFlightController()
+        if FC != nil {
+            //let rotation: DJIGimbalRotation = DJIGimbalRotation.init(pitchValue: 0, rollValue: 0, yawValue: 0, time: 1.0, mode: rotationMode)
+            let led: DJIMutableFlightControllerLEDsSettings = DJIMutableFlightControllerLEDsSettings.init()
+            led.frontLEDsOn = frontLEDs
+            FC?.setLEDsEnabledSettings(led, withCompletion: { (error: Error?) in
+                if error != nil {
+                    NSLog("Error set front Led \(frontLEDs)")
+                } else {
+                    NSLog("Set front Led \(frontLEDs)")
+                }
+            })
+        }
+    }
+    
     //MARK:- Flight Gimbal
     func fetchGimbal() -> DJIGimbal? {
         

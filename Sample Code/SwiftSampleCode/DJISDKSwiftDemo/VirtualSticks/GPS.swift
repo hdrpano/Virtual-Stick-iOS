@@ -105,4 +105,32 @@ class GPS {
                       longSeconds,
                       longDegrees >= 0 ? "E" : "W" )
     }
+    
+    //MARK:- GPS Star Mission
+    func star(radius: Double, points: Int, latitude: Double, longitude: Double, altitude: Double) -> [[Double]] {
+        var grid: Array = [[Double]]()
+        var coor: CLLocationCoordinate2D
+        var angle: Float = 0
+        let R: Double = 6371000
+        for z in 0..<points {
+            angle = 360 / Float(points) * Float(z)
+            angle = yawControl(yaw: angle)
+            if z % 2 == 0 {
+                coor = self.newCoor(latitude: latitude, longitude: longitude, distance: radius, bearing: angle, radiusM: R)
+            } else {
+                coor = self.newCoor(latitude: latitude, longitude: longitude, distance: radius/2, bearing: angle, radiusM: R)
+            }
+            
+            if z == 0 {
+                grid = [[Double(coor.latitude), Double(coor.longitude), altitude]]
+            } else {
+                grid.append([Double(coor.latitude), Double(coor.longitude), altitude])
+            }
+        }
+        
+        coor = self.newCoor(latitude: latitude, longitude: longitude, distance: radius, bearing: 0, radiusM: R)
+        grid.append([Double(coor.latitude), Double(coor.longitude), altitude])
+        
+        return grid
+    }
 }
