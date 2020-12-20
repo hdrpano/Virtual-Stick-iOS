@@ -40,7 +40,7 @@ We can add action in the array or read Litchi CSV
 	[[lat,lon,alt,pitch, action_type, POIlat, POIlon…]]
 
 We must create the mission in an array before we start it in GCD
-# GCD dispatch groups
+## GCD dispatch groups
 We create for each GCD action one dispatch group
 
 	 var queue = DispatchQueue(label: "ch.hdrpano.myqueue")
@@ -48,7 +48,7 @@ We create for each GCD action one dispatch group
 	 var aircraftDispatchGroup = DispatchGroup()
 	 var gimbalDispatchGroup = DispatchGroup()
 	 …
-# Start virtual stick
+## Start virtual stick
 When we use virtual stick, the remote controller will be out of service for the pilot. This is dangerous. For this reason, we pack all in async queue to stop the mission at any time we want and to stop virtual stick. We must handle the remaining power of the aircraft too. When the capacity is below 30% we must stop the mission and virtual stick. 
 
 	self.vsController.prepareVirtualStick()
@@ -78,9 +78,12 @@ Now we check the distance and the bearing from the aircraft towards the waypoint
 
 			self.vsMove(roll: speed, pitch: 0, yaw: bearing, vertical: alt)
 		}
-# Speed optimization
+## Speed optimization
 We must adapt speed depending on the distance between 2 waypoints. If the distance is for example 10m you cannot use speed = 8m/s. We must start decelerating speed when we approach the next waypoint. To go smooth we need to start deceleration at the speed/2 when we are at the distance of the speed value. We can calculate the maximum speed = distance / 5. The latency of a small drone is too high when we move only in a few seconds. Acceleration <> Deceleration <> Stop.
 
-# SDK Trial1... Trial2...
-If you try to use SDK 4.14 you better delete your APP first on the iOS system before you reinstall it. Il will not work if you don't.
-Add com.dji.logiclink in the Info file. It is so logic. 
+## SDK 14.4 Trial1... 
+If you try to use **SDK 4.14** you better delete your APP first on the iOS system before you reinstall it. Il will not work if you don't.
+Add com.dji.logiclink in the Info file.
+
+# Connect
+Start the latest **Assistant** software and start fly. The Sample will not connect if the home point is not updated. 

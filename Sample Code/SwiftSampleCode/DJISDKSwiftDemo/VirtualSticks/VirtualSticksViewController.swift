@@ -425,11 +425,16 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.missionButton.setTitleColor(UIColor.red, for: .normal)
         self.missionButton.setTitle("Fly VS Mission...", for: .normal)
         
-        // Pseudo Mission array
+        // Star Mission array
         grid = [[aircraftLocationStart.latitude + offsety / 2, aircraftLocationStart.longitude + offsetx / 2, altitude + 2, pitch, 1],
+                [aircraftLocationStart.latitude + offsety * 1.5, aircraftLocationStart.longitude, altitude + 4, pitch, 1],
                 [aircraftLocationStart.latitude + offsety / 2, aircraftLocationStart.longitude - offsetx / 2, altitude + 4, pitch, 1],
+                [aircraftLocationStart.latitude, aircraftLocationStart.longitude - offsetx * 1.5, altitude + 4, pitch, 1],
                 [aircraftLocationStart.latitude - offsety / 2, aircraftLocationStart.longitude - offsetx / 2, altitude + 6, pitch, 1],
+                [aircraftLocationStart.latitude - offsety * 1.5, aircraftLocationStart.longitude, altitude + 4, pitch, 1],
                 [aircraftLocationStart.latitude - offsety / 2, aircraftLocationStart.longitude + offsetx / 2, altitude + 8, pitch, 1],
+                [aircraftLocationStart.latitude, aircraftLocationStart.longitude + offsetx * 1.5, altitude + 4, pitch, 1],
+                [aircraftLocationStart.latitude + offsety / 2, aircraftLocationStart.longitude + offsetx / 2, altitude + 2, pitch, 1],
                 [aircraftLocationStart.latitude, aircraftLocationStart.longitude, altitude, 0, 1]]
         
         self.addWaypoints(grid: grid)
