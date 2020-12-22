@@ -145,7 +145,7 @@ class VirtualSticksController {
         })
     }
     
-    //MARK: Front LEDs On Off
+    //MARK:- Front LEDs On Off
     func frontLed(frontLEDs: Bool) {
         let FC = self.fetchFlightController()
         if FC != nil {

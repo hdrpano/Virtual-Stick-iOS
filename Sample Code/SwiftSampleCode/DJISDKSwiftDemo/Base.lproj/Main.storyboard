@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="3Wf-wJ-3VA">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="3Wf-wJ-3VA">
     <device id="retina5_5" orientation="landscape" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -47,7 +47,7 @@
                                 <rect key="frame" x="294.66666666666669" y="315.66666666666669" width="149" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="LdB-CI-IVn"/>
-                                    <constraint firstAttribute="width" constant="149" id="WjU-Ms-Ypt"/>
+                                    <constraint firstAttribute="width" constant="149" placeholder="YES" id="WjU-Ms-Ypt"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="italicSystem" pointSize="13"/>
                                 <nil key="highlightedColor"/>
@@ -253,10 +253,10 @@
                                 <exclude reference="pxt-sB-81W"/>
                                 <exclude reference="MSG-Dh-RFE"/>
                                 <exclude reference="MSe-OZ-oRK"/>
-                                <exclude reference="tfv-0m-Y9V"/>
-                                <exclude reference="vEk-bx-HgH"/>
                                 <exclude reference="JgX-kP-hhW"/>
                                 <exclude reference="bHZ-u7-P53"/>
+                                <exclude reference="tfv-0m-Y9V"/>
+                                <exclude reference="vEk-bx-HgH"/>
                                 <exclude reference="19g-7g-QL2"/>
                                 <exclude reference="8Eg-00-l8C"/>
                                 <exclude reference="GUT-FQ-PdE"/>
@@ -272,14 +272,14 @@
                                 <include reference="MSe-OZ-oRK"/>
                                 <exclude reference="WzN-55-Wxv"/>
                                 <exclude reference="m6l-ns-E15"/>
+                                <include reference="JgX-kP-hhW"/>
+                                <include reference="bHZ-u7-P53"/>
+                                <exclude reference="e3F-Qf-PFt"/>
                                 <exclude reference="Qvx-yB-xPX"/>
                                 <exclude reference="YBP-Cc-79l"/>
                                 <exclude reference="fyU-cx-3Wm"/>
                                 <include reference="tfv-0m-Y9V"/>
                                 <include reference="vEk-bx-HgH"/>
-                                <include reference="JgX-kP-hhW"/>
-                                <include reference="bHZ-u7-P53"/>
-                                <exclude reference="e3F-Qf-PFt"/>
                                 <include reference="19g-7g-QL2"/>
                                 <include reference="8Eg-00-l8C"/>
                                 <exclude reference="iqx-Y9-xnZ"/>
@@ -439,11 +439,11 @@
                                         <rect key="frame" x="0.0" y="428" width="736" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="VQi-86-yDQ" id="sd5-6q-Nhp">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="736" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Flight Hub" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FTR-by-Gjr">
-                                                    <rect key="frame" x="16" y="11.666666666666664" width="370" height="21"/>
+                                                    <rect key="frame" x="16" y="11.666666666666664" width="692" height="21"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -828,7 +828,7 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UbC-aS-itK">
-                                <rect key="frame" x="213.99999999999997" y="131" width="308" height="231"/>
+                                <rect key="frame" x="214" y="131" width="308" height="231"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="UbC-aS-itK" secondAttribute="height" multiplier="4:3" id="L2t-wQ-yYJ"/>

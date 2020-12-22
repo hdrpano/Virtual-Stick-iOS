@@ -9,7 +9,6 @@
 
 import UIKit
 import DJISDK
-import Foundation
 
 class StartupViewController: UIViewController {
 
@@ -59,6 +58,7 @@ class StartupViewController: UIViewController {
             })
         }
         
+        // No connection without home location update in SDK 4.14
         if let homeLocationKey = DJIFlightControllerKey(param: DJIFlightControllerParamHomeLocation)  {
             DJISDKManager.keyManager()?.startListeningForChanges(on: homeLocationKey, withListener: self, andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
                 if newValue != nil {
@@ -178,21 +178,4 @@ class StartupViewController: UIViewController {
     }
     
 }
-
-extension String {
-    func fromBase64() -> String? {
-        guard let data = Data(base64Encoded: self) else {
-            return nil
-        }
-        return String(data: data, encoding: .utf8)
-    }
-
-    func toBase64() -> String {
-        return Data(self.utf8).base64EncodedString()
-    }
-}
-
-
-
-
 

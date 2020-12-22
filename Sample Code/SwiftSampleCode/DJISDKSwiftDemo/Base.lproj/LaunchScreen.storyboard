@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iqj-bn-gQq">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="iqj-bn-gQq">
     <device id="retina6_7" orientation="landscape" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -27,7 +27,7 @@
                                 </constraints>
                             </imageView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Virtual Stick Mission" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lUd-kr-vLa">
-                                <rect key="frame" x="341.33333333333331" y="330" width="243.33333333333331" height="34"/>
+                                <rect key="frame" x="341.33333333333331" y="326.66666666666669" width="243.33333333333331" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="28"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
@@ -37,7 +37,7 @@
                         <constraints>
                             <constraint firstItem="FdO-V9-Epe" firstAttribute="centerX" secondItem="2Zj-xo-hgg" secondAttribute="centerX" id="9qE-hJ-DA9"/>
                             <constraint firstItem="FdO-V9-Epe" firstAttribute="centerY" secondItem="2Zj-xo-hgg" secondAttribute="centerY" id="GDQ-Du-igv"/>
-                            <constraint firstItem="lUd-kr-vLa" firstAttribute="top" secondItem="FdO-V9-Epe" secondAttribute="bottom" constant="7.5" id="ahb-2a-bid"/>
+                            <constraint firstItem="lUd-kr-vLa" firstAttribute="top" secondItem="FdO-V9-Epe" secondAttribute="bottom" constant="4" id="ahb-2a-bid"/>
                             <constraint firstItem="lUd-kr-vLa" firstAttribute="centerX" secondItem="2Zj-xo-hgg" secondAttribute="centerX" id="pcI-4a-Qyc"/>
                         </constraints>
                     </view>
