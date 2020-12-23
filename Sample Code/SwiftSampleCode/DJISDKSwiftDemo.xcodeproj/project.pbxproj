@@ -10,7 +10,6 @@
 		238F549224D381B900B84EA3 /* VirtualSticksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 238F549124D381B900B84EA3 /* VirtualSticksViewController.swift */; };
 		2F0FC85D21EDC06100D1C635 /* VideoPreviewerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0FC85C21EDC06100D1C635 /* VideoPreviewerAdapter.swift */; };
 		2F0FC85F21EDC81C00D1C635 /* CameraFPVViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0FC85E21EDC81C00D1C635 /* CameraFPVViewController.swift */; };
-		2F0FC86C21EE058900D1C635 /* libDJIWidget.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F0FC86B21EE058900D1C635 /* libDJIWidget.a */; };
 		2F0FC86E21EE1D0300D1C635 /* DecodeImageCalibrateLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F0FC86D21EE1D0300D1C635 /* DecodeImageCalibrateLogic.swift */; };
 		2F0FC87921F06D9B00D1C635 /* DistortionResource.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 2F0FC87821F06D9B00D1C635 /* DistortionResource.bundle */; };
 		3945144A24E1D01E00F1319B /* GPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3945144924E1D01E00F1319B /* GPS.swift */; };
@@ -38,7 +37,6 @@
 		2F0FC85C21EDC06100D1C635 /* VideoPreviewerAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPreviewerAdapter.swift; sourceTree = "<group>"; };
 		2F0FC85E21EDC81C00D1C635 /* CameraFPVViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFPVViewController.swift; sourceTree = "<group>"; };
 		2F0FC86A21EDFFEE00D1C635 /* DJIWidget-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DJIWidget-Bridging-Header.h"; sourceTree = "<group>"; };
-		2F0FC86B21EE058900D1C635 /* libDJIWidget.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libDJIWidget.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F0FC86D21EE1D0300D1C635 /* DecodeImageCalibrateLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecodeImageCalibrateLogic.swift; sourceTree = "<group>"; };
 		2F0FC87821F06D9B00D1C635 /* DistortionResource.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = DistortionResource.bundle; sourceTree = "<group>"; };
 		3945144924E1D01E00F1319B /* GPS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GPS.swift; path = VirtualSticks/GPS.swift; sourceTree = "<group>"; };
@@ -68,7 +66,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2F0FC86C21EE058900D1C635 /* libDJIWidget.a in Frameworks */,
 				A1557083AB906DC1A214AFDB /* libPods-DJISDKSwiftDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -79,7 +76,6 @@
 		0B6F263FBC093B7B6FB6EF51 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2F0FC86B21EE058900D1C635 /* libDJIWidget.a */,
 				A7E8DEF306B5A65A27249FC8 /* libPods-DJISDKSwiftDemo.a */,
 			);
 			name = Frameworks;

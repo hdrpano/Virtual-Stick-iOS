@@ -9,7 +9,6 @@
 
 import UIKit
 import DJISDK
-import Foundation
 
 class StartupViewController: UIViewController {
 
@@ -54,6 +53,33 @@ class StartupViewController: UIViewController {
                         DispatchQueue.main.async {
                             self.productConnected()
                         }
+                    }
+                }
+            })
+        }
+        
+        //MARK: New  Product Listener
+        if let productKey = DJIProductKey.modelName() {
+            DJISDKManager.keyManager()?.startListeningForChanges(on: productKey, withListener: self, andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
+                if let productName = newValue?.stringValue {
+                    NSLog("New Product connected \(productName)")
+                    DispatchQueue.main.async {
+                        self.productConnected()
+                    }
+                   
+                }
+            })
+        }
+        
+        // No connection without home location update in SDK 4.14
+        if let homeLocationKey = DJIFlightControllerKey(param: DJIFlightControllerParamHomeLocation)  {
+            DJISDKManager.keyManager()?.startListeningForChanges(on: homeLocationKey, withListener: self, andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
+                if newValue != nil {
+                    let newLocationValue = newValue!.value as! CLLocation
+                    
+                    if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+                        let homeLocation = newLocationValue.coordinate  // we need that for Airmap
+                        NSLog("Home location set \(homeLocation)")
                     }
                 }
             })
@@ -165,21 +191,4 @@ class StartupViewController: UIViewController {
     }
     
 }
-
-extension String {
-    func fromBase64() -> String? {
-        guard let data = Data(base64Encoded: self) else {
-            return nil
-        }
-        return String(data: data, encoding: .utf8)
-    }
-
-    func toBase64() -> String {
-        return Data(self.utf8).base64EncodedString()
-    }
-}
-
-
-
-
 
