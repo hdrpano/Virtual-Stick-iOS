@@ -19,6 +19,8 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var missionButton: UIButton!
     @IBOutlet weak var speedLabel: UILabel!
+    @IBOutlet weak var fpvView: UIView!
+    @IBOutlet var fpvRatio: [NSLayoutConstraint]!
     
     //MARK: MKMapView
     var homeAnnotation = DJIImageAnnotation(identifier: "homeAnnotation")
@@ -68,6 +70,8 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var vsController = VirtualSticksController()
     var camController = CameraController()
     
+    var adapter: VideoPreviewerAdapter?
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent;
     }
@@ -80,6 +84,11 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         super.viewDidLoad()
         
         self.mapView.delegate = self
+        
+        DJIVideoPreviewer.instance()?.start()
+        
+        self.adapter = VideoPreviewerAdapter.init()
+        self.adapter?.start()
 
         // Grab a reference to the aircraft
         if let aircraft = DJISDKManager.product() as? DJIAircraft {
@@ -113,6 +122,9 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                         print("Error setting multiple flight mode");
                     }
                 })
+                
+                // Reset fpv View
+                self.camController.setCameraMode(cameraMode: .shootPhoto)
             }
         }
     }
@@ -120,6 +132,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     override func viewWillAppear(_ animated: Bool) {
         self.mapView.addAnnotations([self.aircraftAnnotation, self.homeAnnotation])
         self.addKeys()
+        DJIVideoPreviewer.instance()?.setView(self.fpvView)
     }
     
     //MARK: View Did Disappear
@@ -519,7 +532,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     func startVSStarNow() {
         var grid: Array = [[Double]]()
         let radius: Double = 50
-        let speed: Float = min(Float(radius) / 7, 4)
+        let speed: Float = min(Float(radius) / 4, 8)
         self.vsSpeed = speed
         let altitude: Double = max(self.aircraftAltitude, 10)
         let pitch: Double = -90

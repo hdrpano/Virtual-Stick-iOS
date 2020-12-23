@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="3Wf-wJ-3VA">
-    <device id="retina5_5" orientation="landscape" appearance="dark"/>
+    <device id="retina5_5" orientation="landscape" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
@@ -509,7 +509,7 @@
                                     <action selector="startVSMission:" destination="Pxd-4i-Efk" eventType="touchUpInside" id="C6Q-4e-R6U"/>
                                 </connections>
                             </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G2t-Ph-elc">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G2t-Ph-elc" userLabel="x axes">
                                 <rect key="frame" x="74" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="x axes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cic-D9-RCV">
@@ -535,7 +535,7 @@
                                     <constraint firstItem="cic-D9-RCV" firstAttribute="leading" secondItem="G2t-Ph-elc" secondAttribute="leading" constant="8" id="vse-sL-Chp"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="az2-eS-rLC">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="az2-eS-rLC" userLabel="y axes">
                                 <rect key="frame" x="147" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="y axes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hCg-sV-HBM">
@@ -561,7 +561,7 @@
                                     <constraint firstItem="hCg-sV-HBM" firstAttribute="top" secondItem="az2-eS-rLC" secondAttribute="top" constant="4" id="zZs-4Y-zS1"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fbw-j8-3GQ">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fbw-j8-3GQ" userLabel="bearing">
                                 <rect key="frame" x="451" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="bearing" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zFe-bG-ond">
@@ -587,7 +587,7 @@
                                     <constraint firstItem="zFe-bG-ond" firstAttribute="leading" secondItem="fbw-j8-3GQ" secondAttribute="leading" constant="8" id="nq6-Y7-yh5"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XfM-HW-MHM">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XfM-HW-MHM" userLabel="altitude">
                                 <rect key="frame" x="524" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="altitude" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1NZ-89-TZ9">
@@ -613,7 +613,7 @@
                                     <constraint firstItem="37G-Pv-4DU" firstAttribute="top" secondItem="1NZ-89-TZ9" secondAttribute="bottom" constant="5" id="tXF-Lb-ydN"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3bz-44-b9x">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3bz-44-b9x" userLabel="z axes">
                                 <rect key="frame" x="220" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="z axes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ENc-xp-05m">
@@ -639,7 +639,7 @@
                                     <constraint firstItem="ENc-xp-05m" firstAttribute="leading" secondItem="3bz-44-b9x" secondAttribute="leading" constant="8" id="iyN-4Q-Rf8"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TEk-GO-EvA">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TEk-GO-EvA" userLabel="pitch">
                                 <rect key="frame" x="597" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="pitch" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T5l-XR-Mfd">
@@ -665,7 +665,7 @@
                                     <constraint firstAttribute="height" constant="45" id="vAZ-2o-zBR"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3l9-2c-7OR">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3l9-2c-7OR" userLabel="distance">
                                 <rect key="frame" x="670" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="distance" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="x2d-Tp-y6T">
@@ -691,7 +691,7 @@
                                     <constraint firstAttribute="width" constant="65" id="n91-Sp-YNH"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ggf-eZ-fUK">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ggf-eZ-fUK" userLabel="speed">
                                 <rect key="frame" x="1" y="13" width="65" height="45"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="speed" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yAB-Pi-gJa">
@@ -717,6 +717,14 @@
                                     <constraint firstItem="ePf-jy-Iqb" firstAttribute="top" secondItem="yAB-Pi-gJa" secondAttribute="bottom" constant="5" id="vHf-N7-rdy"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bdT-7D-Jg9" userLabel="fpv">
+                                <rect key="frame" x="30" y="222" width="170.66666666666666" height="128"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="128" id="98s-yK-YXx"/>
+                                    <constraint firstAttribute="width" secondItem="bdT-7D-Jg9" secondAttribute="height" multiplier="4:3" id="WXU-Qq-voz"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
@@ -728,6 +736,7 @@
                             <constraint firstItem="G2t-Ph-elc" firstAttribute="leading" secondItem="Ggf-eZ-fUK" secondAttribute="trailing" constant="8" symbolic="YES" id="GO6-gh-6ue"/>
                             <constraint firstItem="3bz-44-b9x" firstAttribute="top" secondItem="nh1-iA-vbP" secondAttribute="bottom" constant="13" id="K1J-4l-x68"/>
                             <constraint firstItem="Ggf-eZ-fUK" firstAttribute="top" secondItem="nh1-iA-vbP" secondAttribute="bottom" constant="13" id="O93-ey-rBi"/>
+                            <constraint firstItem="CIJ-dV-edz" firstAttribute="top" secondItem="bdT-7D-Jg9" secondAttribute="bottom" constant="20" id="TMQ-c7-M5B"/>
                             <constraint firstItem="4WQ-iv-XBl" firstAttribute="top" secondItem="P21-oD-JDj" secondAttribute="bottom" constant="13" id="VpO-m5-NV7"/>
                             <constraint firstItem="XfM-HW-MHM" firstAttribute="top" secondItem="nh1-iA-vbP" secondAttribute="bottom" constant="13" id="XaO-kt-4eX"/>
                             <constraint firstItem="4WQ-iv-XBl" firstAttribute="centerX" secondItem="WcZ-Fs-BkQ" secondAttribute="centerX" id="Yc6-bD-H43"/>
@@ -737,6 +746,7 @@
                             <constraint firstItem="fbw-j8-3GQ" firstAttribute="top" secondItem="nh1-iA-vbP" secondAttribute="bottom" constant="13" id="ey8-3L-rdK"/>
                             <constraint firstAttribute="bottomMargin" secondItem="4WQ-iv-XBl" secondAttribute="bottom" constant="20" id="fNk-Kx-68M"/>
                             <constraint firstItem="XfM-HW-MHM" firstAttribute="leading" secondItem="fbw-j8-3GQ" secondAttribute="trailing" constant="8" symbolic="YES" id="fab-oi-qWX"/>
+                            <constraint firstItem="bdT-7D-Jg9" firstAttribute="leading" secondItem="WcZ-Fs-BkQ" secondAttribute="leadingMargin" constant="10" id="kiZ-fy-kUQ"/>
                             <constraint firstItem="4WQ-iv-XBl" firstAttribute="leading" secondItem="WcZ-Fs-BkQ" secondAttribute="leadingMargin" constant="10" id="prb-A8-Rcs"/>
                             <constraint firstItem="az2-eS-rLC" firstAttribute="top" secondItem="nh1-iA-vbP" secondAttribute="bottom" constant="13" id="q7I-ZP-HDC"/>
                             <constraint firstItem="3l9-2c-7OR" firstAttribute="top" secondItem="nh1-iA-vbP" secondAttribute="bottom" constant="13" id="rnU-IW-0UT"/>
@@ -750,6 +760,7 @@
                         <outlet property="altitudeLabel" destination="37G-Pv-4DU" id="yB7-pf-F3f"/>
                         <outlet property="bearingLabel" destination="yyt-9t-wN5" id="N2m-zb-Qec"/>
                         <outlet property="distanceLabel" destination="Ef8-Sz-0a9" id="Eoe-1t-8tb"/>
+                        <outlet property="fpvView" destination="bdT-7D-Jg9" id="GHY-n7-X90"/>
                         <outlet property="gimbalPitchLabel" destination="Es5-1J-neQ" id="Z98-O7-lbj"/>
                         <outlet property="mapView" destination="4WQ-iv-XBl" id="TXE-oD-IdW"/>
                         <outlet property="missionButton" destination="P21-oD-JDj" id="mwF-xK-QF3"/>
@@ -757,6 +768,7 @@
                         <outlet property="xLabel" destination="Kqz-7O-9XV" id="kao-CT-Rbv"/>
                         <outlet property="yLabel" destination="c5Q-da-iRt" id="400-RL-4uG"/>
                         <outlet property="zLabel" destination="fze-rz-n4E" id="9jI-iU-NIK"/>
+                        <outletCollection property="fpvRatio" destination="WXU-Qq-voz" collectionClass="NSMutableArray" id="7Zl-EV-nWm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="irD-FP-mlT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

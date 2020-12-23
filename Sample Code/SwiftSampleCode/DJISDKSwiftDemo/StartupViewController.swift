@@ -58,6 +58,19 @@ class StartupViewController: UIViewController {
             })
         }
         
+        //MARK: New  Product Listener
+        if let productKey = DJIProductKey.modelName() {
+            DJISDKManager.keyManager()?.startListeningForChanges(on: productKey, withListener: self, andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
+                if let productName = newValue?.stringValue {
+                    NSLog("New Product connected \(productName)")
+                    DispatchQueue.main.async {
+                        self.productConnected()
+                    }
+                   
+                }
+            })
+        }
+        
         // No connection without home location update in SDK 4.14
         if let homeLocationKey = DJIFlightControllerKey(param: DJIFlightControllerParamHomeLocation)  {
             DJISDKManager.keyManager()?.startListeningForChanges(on: homeLocationKey, withListener: self, andUpdate: { (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in

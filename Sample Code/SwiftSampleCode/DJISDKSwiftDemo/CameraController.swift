@@ -31,6 +31,27 @@ class CameraController {
         return sdCountValue
     }
     
+    //MARK:- Get Ratio
+    func getRatio() -> DJICameraPhotoAspectRatio {
+        guard let ratioKey = DJICameraKey(param: DJICameraParamPhotoAspectRatio) else {
+            return DJICameraPhotoAspectRatio.ratioUnknown
+        }
+        guard let ratio = DJISDKManager.keyManager()?.getValueFor(ratioKey) else {
+            return DJICameraPhotoAspectRatio.ratioUnknown
+        }
+        let ratioValue = ratio.intValue
+        switch ratioValue {
+        case 0:
+            return DJICameraPhotoAspectRatio.ratio4_3
+        case 1:
+            return DJICameraPhotoAspectRatio.ratio16_9
+        case 2:
+            return DJICameraPhotoAspectRatio.ratio3_2
+        default:
+            return DJICameraPhotoAspectRatio.ratio4_3
+        }
+    }
+    
     //MARK:- Start Shoot Photo
     func startShootPhoto() {
         let camera = self.fetchCamera()
