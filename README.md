@@ -1,4 +1,8 @@
-![swift 5.1](https://img.shields.io/badge/swift-5.1-green.svg) ![platform iOS](https://img.shields.io/badge/platform-iOS-lightgrey.svg) ![pod  4.14trial1](https://img.shields.io/badge/DJI%20SDK-4.14trial1-blue.svg) ![license MIT](https://img.shields.io/badge/license-MIT-green.svg) ![Aircrafts](https://img.shields.io/badge/Aircrafts-Inspire%20%7C%20Matrice%20%7C%20Mavic%20%7C%20Phantom%20%7C%20Spark%20%7C%20Mini1-lightgrey.svg)
+![swift 5.1](https://img.shields.io/badge/swift-5.1-green.svg) 
+![platform iOS](https://img.shields.io/badge/platform-iOS-lightgrey.svg) 
+![pod 4.14trial1](https://img.shields.io/badge/DJI%20SDK-4.14trial1-blue.svg) 
+![license MIT](https://img.shields.io/badge/license-MIT-green.svg) 
+![Aircrafts](https://img.shields.io/badge/Aircrafts-Inspire%20%7C%20Matrice%20%7C%20Mavic%20%7C%20Phantom%20%7C%20Spark%20%7C%20Mini1-lightgrey.svg)
 # Virtual Stick Waypoints
 We must add 2 listeners for the aircraft location and the aircraft heading
 
@@ -85,5 +89,8 @@ We must adapt speed depending on the distance between 2 waypoints. If the distan
 If you try to use **SDK 4.14** you better delete your APP first on the iOS system before you reinstall it. Il will not work if you don't.
 Add com.dji.logiclink in the Info file.
 
-# Connect
+## Connect
 Start the latest **Assistant** software and start fly. The Sample will not connect if the home point is not updated. 
+
+## hdrpano
+https://hdrpano.ch
