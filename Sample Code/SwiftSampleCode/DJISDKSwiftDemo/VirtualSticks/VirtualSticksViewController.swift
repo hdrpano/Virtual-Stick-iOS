@@ -20,7 +20,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     @IBOutlet weak var missionButton: UIButton!
     @IBOutlet weak var speedLabel: UILabel!
     @IBOutlet weak var fpvView: UIView!
-    @IBOutlet var fpvRatio: [NSLayoutConstraint]!
+    @IBOutlet weak var fpvRatio: NSLayoutConstraint!
     
     //MARK: MKMapView
     var homeAnnotation = DJIImageAnnotation(identifier: "homeAnnotation")
@@ -125,6 +125,18 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                 
                 // Reset fpv View
                 self.camController.setCameraMode(cameraMode: .shootPhoto)
+                
+                //MARK: ajust fpv view
+                switch self.camController.getRatio() {
+                case DJICameraPhotoAspectRatio.ratio4_3:
+                    fpvRatio.constant = 4/3
+                case DJICameraPhotoAspectRatio.ratio3_2:
+                    fpvRatio.constant = 3/2
+                case DJICameraPhotoAspectRatio.ratio16_9:
+                    fpvRatio.constant = 16/9
+                default:
+                    fpvRatio.constant = 4/3
+                }
             }
         }
     }

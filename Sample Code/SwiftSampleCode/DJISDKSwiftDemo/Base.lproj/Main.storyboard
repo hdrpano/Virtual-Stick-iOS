@@ -760,6 +760,7 @@
                         <outlet property="altitudeLabel" destination="37G-Pv-4DU" id="yB7-pf-F3f"/>
                         <outlet property="bearingLabel" destination="yyt-9t-wN5" id="N2m-zb-Qec"/>
                         <outlet property="distanceLabel" destination="Ef8-Sz-0a9" id="Eoe-1t-8tb"/>
+                        <outlet property="fpvRatio" destination="WXU-Qq-voz" id="iKr-wn-Aqv"/>
                         <outlet property="fpvView" destination="bdT-7D-Jg9" id="GHY-n7-X90"/>
                         <outlet property="gimbalPitchLabel" destination="Es5-1J-neQ" id="Z98-O7-lbj"/>
                         <outlet property="mapView" destination="4WQ-iv-XBl" id="TXE-oD-IdW"/>
@@ -768,7 +769,6 @@
                         <outlet property="xLabel" destination="Kqz-7O-9XV" id="kao-CT-Rbv"/>
                         <outlet property="yLabel" destination="c5Q-da-iRt" id="400-RL-4uG"/>
                         <outlet property="zLabel" destination="fze-rz-n4E" id="9jI-iU-NIK"/>
-                        <outletCollection property="fpvRatio" destination="WXU-Qq-voz" collectionClass="NSMutableArray" id="7Zl-EV-nWm"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="irD-FP-mlT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
