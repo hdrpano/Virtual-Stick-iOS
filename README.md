@@ -12,22 +12,22 @@ We must add 2 listeners for the aircraft location and the aircraft heading
 	if let locationKey = DJIFlightControllerKey(param: DJIFlightControllerParamAircraftLocation)  {
 		DJISDKManager.keyManager()?.startListeningForChanges(on: locationKey, withListener: self) { [unowned self] (oldValue: DJIKeyedValue?, newValue: DJIKeyedValue?) in
 		if newValue != nil {
-		let newLocationValue = newValue!.value as! CLLocation
+			let newLocationValue = newValue!.value as! CLLocation
 
-		if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
-			self.aircraftLocation = newLocationValue.coordinate                   
-		}
+			if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+				self.aircraftLocation = newLocationValue.coordinate                   
+			}
 		}
 	}
 	DJISDKManager.keyManager()?.getValueFor(locationKey, withCompletion: { (value:DJIKeyedValue?, error:Error?) in
-	if value != nil {
-		let newLocationValue = value!.value as! CLLocation
-		if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
-			self.aircraftLocation = newLocationValue.coordinate
+		if value != nil {
+			let newLocationValue = value!.value as! CLLocation
+			if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+				self.aircraftLocation = newLocationValue.coordinate
+			}
 		}
-		}
-		})
-	}
+	})
+	
 
 We must add a timer to send continuous commands to the aircraft.
 Mission Array like Litchi CVS
