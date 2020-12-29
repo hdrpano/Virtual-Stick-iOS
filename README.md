@@ -4,6 +4,8 @@
 ![license MIT](https://img.shields.io/badge/license-MIT-green.svg) 
 ![Aircrafts](https://img.shields.io/badge/Aircrafts-Inspire%20%7C%20Matrice%20%7C%20Mavic%20%7C%20Phantom%20%7C%20Spark%20%7C%20Mini1-lightgrey.svg)
 # Virtual Stick Waypoints
+In this sample we use Virtual Stick for GPS missions. 3 main functions from the aircraft are supported: Aircraft move x, y, z / gimbal move / camera with AEB or time intervall. The GPS mission is stored in an Array. 
+
 We must add 2 listeners for the aircraft location and the aircraft heading
 
 	self.aircraftLocation
