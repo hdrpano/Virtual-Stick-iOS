@@ -220,7 +220,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                             let bearing = gps.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
                             if distance < 1000 {self.distanceLabel.text = String((distance*10).rounded()/10) + "m"}
                             self.bearingLabel.text = String((bearing*10).rounded()/10) + " °"
-                            if self.vsSpeed != 0 {self.speedLabel.text = String((self.vsSpeed*10).rounded()/10) + "m/s"}
                             
                             let viewRegion = MKCoordinateRegion(center: self.aircraftLocation, latitudinalMeters: 100, longitudinalMeters: 100)
                             self.mapView.setRegion(viewRegion, animated: true)
@@ -258,6 +257,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     if (self.aircraftAnnotationView != nil) {
                         self.aircraftAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat(self.degreesToRadians(Double(self.aircraftAnnotation.heading))))
                     }
+                    self.speedLabel.text = String((self.vsController.velocity() * 10).rounded()/10) + "m/s"
                 }
             })
         }
@@ -318,7 +318,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         
         // Slow down the aircraft
         if distance <= Double(self.vsSpeed) {
-            self.vsSpeed = Float(distance / 2)
+            self.vsSpeed = Float(distance / 3)
             if distance < 2 {
                 print("Close, slow speed \((self.vsSpeed*10).rounded()/10)m/s distance to target \((distance*10).rounded()/10)m")
             }
@@ -340,6 +340,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         }
         
         // Virtual Stick send command
+        // Use pitch instead of roll for POI
         self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(self.vsTargetBearing), vertical: Float(self.vsTargetAltitude))
         
         // We reach the waypoint
@@ -614,53 +615,31 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     // MARK: MKMapViewDelegate mixed
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         var image: UIImage!
-        var DJI:Bool = false
         
         if annotation.isEqual(self.aircraftAnnotation) {
             image = #imageLiteral(resourceName: "drone")
-            DJI = true
         } else if annotation.isEqual(self.homeAnnotation) {
             image = #imageLiteral(resourceName: "waypoint")
-            DJI = true
-        }
-        
-        if annotation is MKPointAnnotation && !DJI {
-            image = #imageLiteral(resourceName: "navigation_poi_pin")
-            let identifier = "Annotation"
-            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-
-            if annotationView == nil {
-                annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                annotationView!.canShowCallout = true
-            } else {
-                annotationView!.annotation = annotation
-            }
-            
-            annotationView?.image = image
-
-            return annotationView
-            
         } else {
-        
-            let imageAnnotation = annotation as! DJIImageAnnotation
-            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: imageAnnotation.identifier)
-
-            if annotationView == nil {
-                annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: imageAnnotation.identifier)
-            }
-            
-            annotationView?.image = image
-            // annotationView?.centerOffset = CGPoint(x: -17.5, y: -17.5)
-            
-            if annotation.isEqual(self.aircraftAnnotation) {
-                if annotationView != nil {
-                    self.aircraftAnnotationView = annotationView!
-                }
-            }
-            
-            return annotationView
+            image = #imageLiteral(resourceName: "navigation_poi_pin")
         }
+        
+        let imageAnnotation = annotation as! DJIImageAnnotation
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: imageAnnotation.identifier)
 
+        if annotationView == nil {
+            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: imageAnnotation.identifier)
+        }
+        
+        annotationView?.image = image
+        
+        if annotation.isEqual(self.aircraftAnnotation) {
+            if annotationView != nil {
+                self.aircraftAnnotationView = annotationView!
+            }
+        }
+        
+        return annotationView
         
     }
     
@@ -685,9 +664,8 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             let alt = mP[2]
             
             if CLLocationCoordinate2DIsValid(CLLocationCoordinate2DMake(lat, lon)) && alt < 250 {
-                self.waypointAnnotation.coordinate = CLLocationCoordinate2DMake(lat, lon)
-                let annotation = MKPointAnnotation()
-                annotation.title = "Photo"
+                let annotation = DJIImageAnnotation(identifier: "Waypoint")
+                annotation.title = "Waypoint"
                 let gps = self.GPSController.coordinateString(lat, lon)
                 annotation.subtitle = "\(gps)\n\(alt)m"
                 annotation.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)

@@ -162,6 +162,25 @@ class VirtualSticksController {
         }
     }
     
+    //MARK:- Is Advanced Virtual Stick
+    func velocity() -> Double {
+        guard let velocityKey = DJIFlightControllerKey(param: DJIFlightControllerParamVelocity) else {
+            return 0
+        }
+        
+        guard let velocity = DJISDKManager.keyManager()?.getValueFor(velocityKey) else {
+            return 0
+        }
+        
+        let Vector = velocity.value as! DJISDKVector3D
+        
+        let speed = pow((pow(Vector.x,2) + pow(Vector.y,2)),0.5)
+       
+        // NSLog("Velocity \((speed*10).rounded()/10)")
+        
+        return speed
+    }
+    
     //MARK:- Flight Gimbal
     func fetchGimbal() -> DJIGimbal? {
         
