@@ -20,7 +20,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     @IBOutlet weak var missionButton: UIButton!
     @IBOutlet weak var speedLabel: UILabel!
     @IBOutlet weak var fpvView: UIView!
-    @IBOutlet var fpvRatio: [NSLayoutConstraint]!
+    @IBOutlet weak var fpvRatio: NSLayoutConstraint!
     
     //MARK: MKMapView
     var homeAnnotation = DJIImageAnnotation(identifier: "homeAnnotation")
@@ -54,10 +54,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var aircraftAltitude: Double = 0
     var aircraftHeading: Double = 0
     var vsTargetAltitude: Double = 0
-    var vsTargetBearing: Double = 0
-    var targetAircraftYaw: Double = 0
-    var targetGimbalPitch: Double = 0
-    var targetGimbalYaw: Double = 0
+    // var vsTargetBearing: Double = 0
+    var vsTargetAircraftYaw: Double = 0
+    var vsTargetGimbalPitch: Double = 0
+    var vsTargetGimbalYaw: Double = 0
     var gimbalPitch: Double = 0
     let start = Date()
     var vsSpeed: Float = 0
@@ -125,6 +125,18 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                 
                 // Reset fpv View
                 self.camController.setCameraMode(cameraMode: .shootPhoto)
+                
+                //MARK: ajust fpv view
+                switch self.camController.getRatio() {
+                case DJICameraPhotoAspectRatio.ratio4_3:
+                    fpvRatio.constant = 4/3
+                case DJICameraPhotoAspectRatio.ratio3_2:
+                    fpvRatio.constant = 3/2
+                case DJICameraPhotoAspectRatio.ratio16_9:
+                    fpvRatio.constant = 16/9
+                default:
+                    fpvRatio.constant = 4/3
+                }
             }
         }
     }
@@ -176,7 +188,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.gimbalDispatchGroup.enter()
         self.GCDgimbal = false
         self.GCDgimbalFT = self.start.timeIntervalSinceNow * -1
-        self.vsController.moveGimbal(pitch: Float(self.targetGimbalPitch), roll: 0, yaw: 0, time: 1, rotationMode: .absoluteAngle)
+        self.vsController.moveGimbal(pitch: Float(self.vsTargetGimbalPitch), roll: 0, yaw: 0, time: 1, rotationMode: .absoluteAngle)
         self.gimbalDispatchGroup.wait()
     }
     
@@ -208,7 +220,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                             let bearing = gps.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
                             if distance < 1000 {self.distanceLabel.text = String((distance*10).rounded()/10) + "m"}
                             self.bearingLabel.text = String((bearing*10).rounded()/10) + " °"
-                            if self.vsSpeed != 0 {self.speedLabel.text = String((self.vsSpeed*10).rounded()/10) + "m/s"}
                             
                             let viewRegion = MKCoordinateRegion(center: self.aircraftLocation, latitudinalMeters: 100, longitudinalMeters: 100)
                             self.mapView.setRegion(viewRegion, animated: true)
@@ -246,6 +257,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     if (self.aircraftAnnotationView != nil) {
                         self.aircraftAnnotationView.transform = CGAffineTransform(rotationAngle: CGFloat(self.degreesToRadians(Double(self.aircraftAnnotation.heading))))
                     }
+                    self.speedLabel.text = String((self.vsController.velocity() * 10).rounded()/10) + "m/s"
                 }
             })
         }
@@ -301,37 +313,32 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         
     //MARK: Show Virtual Stick Move Action
     func showVS() {
-        let bearing = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
+        var bearing = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         let distance = self.GPSController.getDistanceBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         
-        // Slow down the aircraft
-        if distance <= Double(self.vsSpeed) {
-            self.vsSpeed = Float(distance / 2)
-            if distance < 2 {
+        // Slow down the aircraft when distance to target is close
+        if distance <= Double(self.vsSpeed) && distance > self.nearTargetDistance {
+            self.vsSpeed = max(Float(distance / 3), 0.2)
+            if distance < self.nearTargetDistance * 2 {
                 print("Close, slow speed \((self.vsSpeed*10).rounded()/10)m/s distance to target \((distance*10).rounded()/10)m")
             }
         } else {
             print("Move, distance to target \((distance*10).rounded()/10)m speed \((self.vsSpeed*10).rounded()/10)m/s")
         }
         
-        // Turn heading
-        if self.aircraftHeading != bearing {
-            self.vsTargetBearing = bearing
-            if abs(self.aircraftHeading - bearing) > 1 {
-                print("Move correct heading \((self.aircraftHeading*10).rounded()/10) \(Int(self.vsTargetBearing))")
-            }
-        }
-        
-        // Move to the target altitude
-        if self.aircraftAltitude - self.vsTargetAltitude > self.nearTargetDistance {
+        // Move to the target altitude, control bearing to target bearing
+        if self.aircraftAltitude - self.vsTargetAltitude > self.nearTargetDistance && distance < self.nearTargetDistance {
+            bearing = self.vsTargetAircraftYaw
             print("Move vertical \(Int(self.aircraftAltitude)) target [\(Int(self.vsTargetAltitude))")
         }
         
         // Virtual Stick send command
-        self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(self.vsTargetBearing), vertical: Float(self.vsTargetAltitude))
+        // Use pitch instead of roll for POI
+        self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(bearing), vertical: Float(self.vsTargetAltitude))
         
         // We reach the waypoint
         if distance < self.nearTargetDistance && self.aircraftAltitude - self.vsTargetAltitude < self.nearTargetDistance {
+            self.vsController.vsMove(pitch: 0, roll: 0, yaw: Float(bearing), vertical: Float(self.vsTargetAltitude))
             self.GCDvs = true
             print("VS Mission step complete")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -344,7 +351,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     func showAircraftYaw() {
         let time = self.start.timeIntervalSinceNow * -1 - self.GCDaircraftYawFT
         if !self.GCDaircraftYaw {
-            var diff: Double = abs(self.self.aircraftHeading - self.targetAircraftYaw)
+            var diff: Double = abs(self.self.aircraftHeading - self.vsTargetAircraftYaw)
             if diff >= 180 { diff = abs(diff - 360) }
             if diff < 2 { // 1.5° - 3°
                 print("Aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
@@ -354,7 +361,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                 }
             } else {
                 print("Wait on aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
-                self.vsController.vsYaw(yaw: Float(self.targetAircraftYaw)) // repeat between 5 and 20Hz perfect with the listener
+                self.vsController.vsYaw(yaw: Float(self.vsTargetAircraftYaw)) // repeat between 5 and 20Hz perfect with the listener
             }
             // Timeout call
             if time > 5 {
@@ -369,7 +376,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     func showGimbal() {
         let time = self.start.timeIntervalSinceNow * -1 - self.GCDgimbalFT
         if !self.GCDgimbal && time > 0.9 {
-            let pitchDiff = abs(self.gimbalPitch - self.targetGimbalPitch)
+            let pitchDiff = abs(self.gimbalPitch - self.vsTargetGimbalPitch)
             if pitchDiff < 2 { //  1.5° - 3°
                 print("Gimbal pitch \((pitchDiff*10).rounded()/10) heading \((self.aircraftHeading*10).rounded()/10)")
                 self.GCDgimbal = true
@@ -490,13 +497,13 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                         self.vsTargetLocation.latitude = lat
                         self.vsTargetLocation.longitude = lon
                         self.vsTargetAltitude = alt
-                        self.targetGimbalPitch = pitch
-                        self.targetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
+                        self.vsTargetGimbalPitch = pitch
+                        self.vsTargetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
                         
                         self.moveGimbal()
                         if self.GCDProcess == false { break } // Exit point for dispatch group
                         
-                        if abs(self.aircraftHeading - self.targetAircraftYaw) > 5 {
+                        if abs(self.aircraftHeading - self.vsTargetAircraftYaw) > 5 {
                             self.yawAircraft()
                             if self.GCDProcess == false { break } // Exit point for dispatch group
                         }
@@ -568,10 +575,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     self.vsTargetLocation.latitude = lat
                     self.vsTargetLocation.longitude = lon
                     self.vsTargetAltitude = alt
-                    self.targetGimbalPitch = pitch
-                    self.targetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
+                    self.vsTargetGimbalPitch = pitch
+                    self.vsTargetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
                     
-                    if abs(self.aircraftHeading - self.targetAircraftYaw) > 5 {
+                    if abs(self.aircraftHeading - self.vsTargetAircraftYaw) > 5 {
                         self.yawAircraft()
                         if self.GCDProcess == false { break } // Exit point for dispatch group
                     }
@@ -602,53 +609,31 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     // MARK: MKMapViewDelegate mixed
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         var image: UIImage!
-        var DJI:Bool = false
         
         if annotation.isEqual(self.aircraftAnnotation) {
             image = #imageLiteral(resourceName: "drone")
-            DJI = true
         } else if annotation.isEqual(self.homeAnnotation) {
             image = #imageLiteral(resourceName: "waypoint")
-            DJI = true
-        }
-        
-        if annotation is MKPointAnnotation && !DJI {
-            image = #imageLiteral(resourceName: "navigation_poi_pin")
-            let identifier = "Annotation"
-            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-
-            if annotationView == nil {
-                annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-                annotationView!.canShowCallout = true
-            } else {
-                annotationView!.annotation = annotation
-            }
-            
-            annotationView?.image = image
-
-            return annotationView
-            
         } else {
-        
-            let imageAnnotation = annotation as! DJIImageAnnotation
-            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: imageAnnotation.identifier)
-
-            if annotationView == nil {
-                annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: imageAnnotation.identifier)
-            }
-            
-            annotationView?.image = image
-            // annotationView?.centerOffset = CGPoint(x: -17.5, y: -17.5)
-            
-            if annotation.isEqual(self.aircraftAnnotation) {
-                if annotationView != nil {
-                    self.aircraftAnnotationView = annotationView!
-                }
-            }
-            
-            return annotationView
+            image = #imageLiteral(resourceName: "navigation_poi_pin")
         }
+        
+        let imageAnnotation = annotation as! DJIImageAnnotation
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: imageAnnotation.identifier)
 
+        if annotationView == nil {
+            annotationView = MKAnnotationView(annotation: annotation, reuseIdentifier: imageAnnotation.identifier)
+        }
+        
+        annotationView?.image = image
+        
+        if annotation.isEqual(self.aircraftAnnotation) {
+            if annotationView != nil {
+                self.aircraftAnnotationView = annotationView!
+            }
+        }
+        
+        return annotationView
         
     }
     
@@ -673,9 +658,8 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             let alt = mP[2]
             
             if CLLocationCoordinate2DIsValid(CLLocationCoordinate2DMake(lat, lon)) && alt < 250 {
-                self.waypointAnnotation.coordinate = CLLocationCoordinate2DMake(lat, lon)
-                let annotation = MKPointAnnotation()
-                annotation.title = "Photo"
+                let annotation = DJIImageAnnotation(identifier: "Waypoint")
+                annotation.title = "Waypoint"
                 let gps = self.GPSController.coordinateString(lat, lon)
                 annotation.subtitle = "\(gps)\n\(alt)m"
                 annotation.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)

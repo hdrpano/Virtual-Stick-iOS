@@ -76,7 +76,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Start Shoot Photo
+    //MARK:- Start Record Video
     func startRecordVideo() {
         let camera = self.fetchCamera()
         if camera != nil {
@@ -88,7 +88,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Stop Shoot Photo
+    //MARK:- Stop Record Video
     func stopRecordVideo() {
         let camera = self.fetchCamera()
         if camera != nil {
