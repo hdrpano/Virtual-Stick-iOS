@@ -95,9 +95,9 @@ You can watch videos about this project on my youtube channel:
 ## Speed optimization
 We must adapt speed depending on the distance between 2 waypoints. If the distance is for example 10m you cannot use speed = 8m/s. We must start decelerating speed when we approach the next waypoint. To go smooth we need to start deceleration at the speed/2 when we are at the distance of the speed value. We can calculate the maximum speed = distance / 5. The latency of a small drone is too high when we move only in a few seconds. Acceleration <> Deceleration <> Stop.
 
-## SDK 14.4 Trial1... 
-If you try to use **SDK 4.14** you better delete your APP first on the iOS system before you reinstall it. Il will not work if you don't.
-Add com.dji.logiclink in the Info file.
+## SDK 14.4 Trial... 
+If you try to use **SDK 4.14** you better delete your older APP (4.13 et.c) first on the iOS system before you reinstall it. Il will not work if you don't.
+Add com.dji.logiclink in the Info file (already done for this project).
 
 ## Connect
 Start the latest **Assistant** software and start fly. The Sample will not connect if the home point is not updated. 
