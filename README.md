@@ -87,6 +87,8 @@ Now we check the distance and the bearing from the aircraft towards the waypoint
 
 [![Watch the video](https://img.youtube.com/vi/fRPYyuK_eLA/maxresdefault.jpg)](https://youtu.be/fRPYyuK_eLA)
 
+[![Watch the video](https://img.youtube.com/vi/fyyaQVDJLs0/hqdefault.jpg)](https://youtu.be/fyyaQVDJLs0)
+
 ## Speed optimization
 We must adapt speed depending on the distance between 2 waypoints. If the distance is for example 10m you cannot use speed = 8m/s. We must start decelerating speed when we approach the next waypoint. To go smooth we need to start deceleration at the speed/2 when we are at the distance of the speed value. We can calculate the maximum speed = distance / 5. The latency of a small drone is too high when we move only in a few seconds. Acceleration <> Deceleration <> Stop.
 
