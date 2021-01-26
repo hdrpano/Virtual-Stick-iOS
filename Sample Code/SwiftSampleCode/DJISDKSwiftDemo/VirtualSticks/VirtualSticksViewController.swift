@@ -234,6 +234,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     let newLocationValue = value!.value as! CLLocation
                     if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
                         self.aircraftLocation = newLocationValue.coordinate
+                        self.aircraftAnnotation.coordinate = newLocationValue.coordinate
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                             let viewRegion = MKCoordinateRegion(center: self.aircraftLocation, latitudinalMeters: 200, longitudinalMeters: 200)
                             self.mapView.setRegion(viewRegion, animated: true)
@@ -298,6 +299,17 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     }
                 }
             }
+            
+            DJISDKManager.keyManager()?.getValueFor(homeLocationKey, withCompletion: { (newValue:DJIKeyedValue?, error:Error?) in
+                if newValue != nil {
+                    let newLocationValue = newValue!.value as! CLLocation
+                    
+                    if CLLocationCoordinate2DIsValid(newLocationValue.coordinate) {
+                        self.homeLocation = newLocationValue.coordinate
+                        self.homeAnnotation.coordinate = newLocationValue.coordinate
+                    }
+                }
+            })
         }
         
         //MARK: SD Card Count Listener
@@ -613,7 +625,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         if annotation.isEqual(self.aircraftAnnotation) {
             image = #imageLiteral(resourceName: "drone")
         } else if annotation.isEqual(self.homeAnnotation) {
-            image = #imageLiteral(resourceName: "waypoint")
+            image = #imageLiteral(resourceName: "home_point")
         } else {
             image = #imageLiteral(resourceName: "navigation_poi_pin")
         }
