@@ -54,10 +54,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     var aircraftAltitude: Double = 0
     var aircraftHeading: Double = 0
     var vsTargetAltitude: Double = 0
-    var vsTargetBearing: Double = 0
-    var targetAircraftYaw: Double = 0
-    var targetGimbalPitch: Double = 0
-    var targetGimbalYaw: Double = 0
+    // var vsTargetBearing: Double = 0
+    var vsTargetAircraftYaw: Double = 0
+    var vsTargetGimbalPitch: Double = 0
+    var vsTargetGimbalYaw: Double = 0
     var gimbalPitch: Double = 0
     let start = Date()
     var vsSpeed: Float = 0
@@ -188,7 +188,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.gimbalDispatchGroup.enter()
         self.GCDgimbal = false
         self.GCDgimbalFT = self.start.timeIntervalSinceNow * -1
-        self.vsController.moveGimbal(pitch: Float(self.targetGimbalPitch), roll: 0, yaw: 0, time: 1, rotationMode: .absoluteAngle)
+        self.vsController.moveGimbal(pitch: Float(self.vsTargetGimbalPitch), roll: 0, yaw: 0, time: 1, rotationMode: .absoluteAngle)
         self.gimbalDispatchGroup.wait()
     }
     
@@ -313,38 +313,32 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         
     //MARK: Show Virtual Stick Move Action
     func showVS() {
-        let bearing = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
+        var bearing = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         let distance = self.GPSController.getDistanceBetweenTwoPoints(point1: self.aircraftLocation, point2: self.vsTargetLocation)
         
-        // Slow down the aircraft
-        if distance <= Double(self.vsSpeed) {
-            self.vsSpeed = Float(distance / 3)
-            if distance < 2 {
+        // Slow down the aircraft when distance to target is close
+        if distance <= Double(self.vsSpeed) && distance > self.nearTargetDistance {
+            self.vsSpeed = max(Float(distance / 3), 0.2)
+            if distance < self.nearTargetDistance * 2 {
                 print("Close, slow speed \((self.vsSpeed*10).rounded()/10)m/s distance to target \((distance*10).rounded()/10)m")
             }
         } else {
             print("Move, distance to target \((distance*10).rounded()/10)m speed \((self.vsSpeed*10).rounded()/10)m/s")
         }
         
-        // Turn heading
-        if self.aircraftHeading != bearing {
-            self.vsTargetBearing = bearing
-            if abs(self.aircraftHeading - bearing) > 1 {
-                print("Move correct heading \((self.aircraftHeading*10).rounded()/10) \(Int(self.vsTargetBearing))")
-            }
-        }
-        
-        // Move to the target altitude
-        if self.aircraftAltitude - self.vsTargetAltitude > self.nearTargetDistance {
+        // Move to the target altitude, control bearing to target bearing
+        if self.aircraftAltitude - self.vsTargetAltitude > self.nearTargetDistance && distance < self.nearTargetDistance {
+            bearing = self.vsTargetAircraftYaw
             print("Move vertical \(Int(self.aircraftAltitude)) target [\(Int(self.vsTargetAltitude))")
         }
         
         // Virtual Stick send command
         // Use pitch instead of roll for POI
-        self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(self.vsTargetBearing), vertical: Float(self.vsTargetAltitude))
+        self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(bearing), vertical: Float(self.vsTargetAltitude))
         
         // We reach the waypoint
         if distance < self.nearTargetDistance && self.aircraftAltitude - self.vsTargetAltitude < self.nearTargetDistance {
+            self.vsController.vsMove(pitch: 0, roll: 0, yaw: Float(bearing), vertical: Float(self.vsTargetAltitude))
             self.GCDvs = true
             print("VS Mission step complete")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -357,7 +351,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     func showAircraftYaw() {
         let time = self.start.timeIntervalSinceNow * -1 - self.GCDaircraftYawFT
         if !self.GCDaircraftYaw {
-            var diff: Double = abs(self.self.aircraftHeading - self.targetAircraftYaw)
+            var diff: Double = abs(self.self.aircraftHeading - self.vsTargetAircraftYaw)
             if diff >= 180 { diff = abs(diff - 360) }
             if diff < 2 { // 1.5° - 3°
                 print("Aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
@@ -367,7 +361,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                 }
             } else {
                 print("Wait on aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
-                self.vsController.vsYaw(yaw: Float(self.targetAircraftYaw)) // repeat between 5 and 20Hz perfect with the listener
+                self.vsController.vsYaw(yaw: Float(self.vsTargetAircraftYaw)) // repeat between 5 and 20Hz perfect with the listener
             }
             // Timeout call
             if time > 5 {
@@ -382,7 +376,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     func showGimbal() {
         let time = self.start.timeIntervalSinceNow * -1 - self.GCDgimbalFT
         if !self.GCDgimbal && time > 0.9 {
-            let pitchDiff = abs(self.gimbalPitch - self.targetGimbalPitch)
+            let pitchDiff = abs(self.gimbalPitch - self.vsTargetGimbalPitch)
             if pitchDiff < 2 { //  1.5° - 3°
                 print("Gimbal pitch \((pitchDiff*10).rounded()/10) heading \((self.aircraftHeading*10).rounded()/10)")
                 self.GCDgimbal = true
@@ -503,13 +497,13 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                         self.vsTargetLocation.latitude = lat
                         self.vsTargetLocation.longitude = lon
                         self.vsTargetAltitude = alt
-                        self.targetGimbalPitch = pitch
-                        self.targetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
+                        self.vsTargetGimbalPitch = pitch
+                        self.vsTargetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
                         
                         self.moveGimbal()
                         if self.GCDProcess == false { break } // Exit point for dispatch group
                         
-                        if abs(self.aircraftHeading - self.targetAircraftYaw) > 5 {
+                        if abs(self.aircraftHeading - self.vsTargetAircraftYaw) > 5 {
                             self.yawAircraft()
                             if self.GCDProcess == false { break } // Exit point for dispatch group
                         }
@@ -581,10 +575,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                     self.vsTargetLocation.latitude = lat
                     self.vsTargetLocation.longitude = lon
                     self.vsTargetAltitude = alt
-                    self.targetGimbalPitch = pitch
-                    self.targetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
+                    self.vsTargetGimbalPitch = pitch
+                    self.vsTargetAircraftYaw = self.GPSController.getBearingBetweenTwoPoints(point1: self.aircraftLocation, point2:self.vsTargetLocation)
                     
-                    if abs(self.aircraftHeading - self.targetAircraftYaw) > 5 {
+                    if abs(self.aircraftHeading - self.vsTargetAircraftYaw) > 5 {
                         self.yawAircraft()
                         if self.GCDProcess == false { break } // Exit point for dispatch group
                     }
