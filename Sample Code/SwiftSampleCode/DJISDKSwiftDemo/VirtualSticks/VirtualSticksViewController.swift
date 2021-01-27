@@ -180,7 +180,6 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.missionButton.setTitleColor(UIColor.red, for: .normal)
         self.missionButton.setTitle("Fly VS Star...", for: .normal)
         self.aircraftLocationBefore = self.aircraftLocation
-        self.intervall = true
         self.triggerDistance = 0
         
         let grid = self.GPSController.star(radius: 50, points: 10, latitude: self.aircraftLocation.latitude, longitude: self.aircraftLocation.longitude,
@@ -189,6 +188,10 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.addWaypoints(grid: grid)
         
         self.startVSStarNow(grid: grid, speed: 4)
+    }
+    
+    @IBAction func intervallSwitchAction(_ sender: UISwitch) {
+        self.intervall = sender.isOn
     }
     
     //MARK: GCD Timer Dispatch Management
