@@ -181,6 +181,18 @@ class VirtualSticksController {
         return speed
     }
     
+    //MARK:- Get Remaining Power
+    func getChargeRemainingInPercent() -> Int {
+        guard let chargeKey = DJIBatteryKey(param: DJIBatteryParamChargeRemainingInPercent) else {
+            return 0
+        }
+        guard let charge = DJISDKManager.keyManager()?.getValueFor(chargeKey) else {
+            return 0
+        }
+        let chargeValue = charge.integerValue
+        return chargeValue
+    }
+    
     //MARK:- Flight Gimbal
     func fetchGimbal() -> DJIGimbal? {
         
