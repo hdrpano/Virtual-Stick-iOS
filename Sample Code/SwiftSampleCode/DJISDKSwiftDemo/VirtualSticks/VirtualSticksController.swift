@@ -113,13 +113,13 @@ class VirtualSticksController {
     }
     
     //MARK:- Yaw Aircraft Virtual Stick
-    func vsYaw(yaw: Float) {
+    func vsYaw(velocity: Float) {
         let fc = self.fetchFlightController()
-        fc?.rollPitchCoordinateSystem = .ground
-        fc?.yawControlMode = .angle
+        fc?.rollPitchCoordinateSystem = .body
+        fc?.yawControlMode = .angularVelocity
         fc?.verticalControlMode = .velocity
 
-        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: 0, roll: 0, yaw: yaw, verticalThrottle: 0)
+        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: 0, roll: 0, yaw: velocity, verticalThrottle: 0)
         fc?.send(ctrlData, withCompletion: {
             (error) in
             if let error = error {
@@ -179,6 +179,18 @@ class VirtualSticksController {
         // NSLog("Velocity \((speed*10).rounded()/10)")
         
         return speed
+    }
+    
+    //MARK:- Get Remaining Power
+    func getChargeRemainingInPercent() -> Int {
+        guard let chargeKey = DJIBatteryKey(param: DJIBatteryParamChargeRemainingInPercent) else {
+            return 0
+        }
+        guard let charge = DJISDKManager.keyManager()?.getValueFor(chargeKey) else {
+            return 0
+        }
+        let chargeValue = charge.integerValue
+        return chargeValue
     }
     
     //MARK:- Flight Gimbal

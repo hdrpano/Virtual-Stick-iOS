@@ -92,7 +92,7 @@ class StartupViewController: UIViewController {
     
     
     func resetUI() {
-        self.title = "DJI iOS SDK Sample Virtual Stick"
+        self.title = "DJI iOS SDK Sample"
         self.sdkVersionLabel.text = "DJI SDK Version: \(DJISDKManager.sdkVersion())"
         self.openComponents.isEnabled = true; //FIXME: set it back to false
         self.bluetoothConnectorButton.isEnabled = true;

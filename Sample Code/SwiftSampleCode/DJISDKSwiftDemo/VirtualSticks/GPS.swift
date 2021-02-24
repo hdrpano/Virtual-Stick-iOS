@@ -107,7 +107,7 @@ class GPS {
     }
     
     //MARK:- GPS Star Mission
-    func star(radius: Double, points: Int, latitude: Double, longitude: Double, altitude: Double) -> [[Double]] {
+    func star(radius: Double, points: Int, latitude: Double, longitude: Double, altitude: Double, pitch: Double) -> [[Double]] {
         var grid: Array = [[Double]]()
         var coor: CLLocationCoordinate2D
         var angle: Float = 0
@@ -122,14 +122,15 @@ class GPS {
             }
             
             if z == 0 {
-                grid = [[Double(coor.latitude), Double(coor.longitude), altitude]]
+                grid = [[Double(coor.latitude), Double(coor.longitude), altitude, pitch]]
             } else {
-                grid.append([Double(coor.latitude), Double(coor.longitude), altitude])
+                grid.append([Double(coor.latitude), Double(coor.longitude), altitude, pitch])
             }
         }
         
         coor = self.newCoor(latitude: latitude, longitude: longitude, distance: radius, bearing: 0, radiusM: R)
-        grid.append([Double(coor.latitude), Double(coor.longitude), altitude])
+        grid.append([Double(coor.latitude), Double(coor.longitude), altitude, pitch])
+        grid.append([Double(latitude), Double(longitude), altitude, pitch])
         
         return grid
     }
