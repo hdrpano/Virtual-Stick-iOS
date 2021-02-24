@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>DJISDKAppKey</key>
-	<string>fa72b338c1bd2e72d557655b</string>
+	<string>edit your key here</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
