@@ -1,25 +1,25 @@
 PODS:
-  - DJI-SDK-iOS (4.14-trial2)
-  - DJIFlySafeDatabaseResource (01.00.01.17)
+  - DJI-SDK-iOS (4.14)
+  - DJIFlySafeDatabaseResource (01.00.01.18)
   - DJIWidget (1.6.4)
 
 DEPENDENCIES:
-  - DJI-SDK-iOS (~> 4.14-trial2)
-  - DJIFlySafeDatabaseResource (~> 01.00.01.17)
+  - DJI-SDK-iOS (~> 4.14)
+  - DJIFlySafeDatabaseResource (~> 01.00.01.18)
   - DJIWidget (~> 1.6.4)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
-    - DJIFlySafeDatabaseResource
     - DJIWidget
   trunk:
     - DJI-SDK-iOS
+    - DJIFlySafeDatabaseResource
 
 SPEC CHECKSUMS:
-  DJI-SDK-iOS: 2234b3b896091f77a072099115f560e9ee8347a0
-  DJIFlySafeDatabaseResource: d2fab77e7c727fff3bd2362ed4cc43b92d566643
+  DJI-SDK-iOS: db08fad65cfb9fecddb34b38851af105bd4133db
+  DJIFlySafeDatabaseResource: 400e1856340042bd6943e53c2d4b374ac8409702
   DJIWidget: ce26deb9fb78494d2189065f431b13a663181b5f
 
-PODFILE CHECKSUM: cb872ff7835fe4463492371981d5357f17af98b2
+PODFILE CHECKSUM: 1e4cfe4f2673a48c204f1b7582179e3f14d7a92d
 
 COCOAPODS: 1.10.0

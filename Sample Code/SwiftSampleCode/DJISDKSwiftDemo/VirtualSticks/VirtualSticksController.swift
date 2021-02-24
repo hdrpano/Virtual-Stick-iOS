@@ -113,13 +113,13 @@ class VirtualSticksController {
     }
     
     //MARK:- Yaw Aircraft Virtual Stick
-    func vsYaw(yaw: Float) {
+    func vsYaw(velocity: Float) {
         let fc = self.fetchFlightController()
-        fc?.rollPitchCoordinateSystem = .ground
-        fc?.yawControlMode = .angle
+        fc?.rollPitchCoordinateSystem = .body
+        fc?.yawControlMode = .angularVelocity
         fc?.verticalControlMode = .velocity
 
-        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: 0, roll: 0, yaw: yaw, verticalThrottle: 0)
+        let ctrlData: DJIVirtualStickFlightControlData = DJIVirtualStickFlightControlData.init(pitch: 0, roll: 0, yaw: velocity, verticalThrottle: 0)
         fc?.send(ctrlData, withCompletion: {
             (error) in
             if let error = error {

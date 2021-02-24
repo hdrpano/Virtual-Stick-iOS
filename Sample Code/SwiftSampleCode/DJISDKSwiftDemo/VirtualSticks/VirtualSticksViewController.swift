@@ -423,21 +423,33 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
     //MARK: Show Aircraft Yaw Action
     func showAircraftYaw() {
         let time = self.start.timeIntervalSinceNow * -1 - self.GCDaircraftYawFT
+        var velocity: Float = 45
+        var direction: Double = 1
         if !self.GCDaircraftYaw {
-            var diff: Double = abs(self.self.aircraftHeading - self.vsTargetAircraftYaw)
+            var diff: Double = abs(self.aircraftHeading - self.vsTargetAircraftYaw)
+            if self.GPSController.yawControl(yaw: Float(self.vsTargetAircraftYaw  - self.aircraftHeading)) < 0 {
+                direction = -1
+            } else {
+                direction = 1
+            }
             if diff >= 180 { diff = abs(diff - 360) }
             if diff < 2 { // 1.5° - 3°
-                print("Aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
+                print("**** Aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
                 self.GCDaircraftYaw = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     self.yawDispatchGroup.leave()
                 }
             } else {
-                print("Wait on aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
-                self.vsController.vsYaw(yaw: Float(self.vsTargetAircraftYaw)) // repeat between 5 and 20Hz perfect with the listener
+                print("**** Wait on aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
+                if diff < 15 {
+                    velocity = Float(diff * direction)
+                } else {
+                    velocity = velocity * Float(direction)
+                }
+                self.vsController.vsYaw(velocity: velocity)
             }
-            // Timeout call
-            if time > 5 {
+            // Timeout call on velocity 45°/s
+            if time > 360 / 45 + 1 {
                 self.GCDaircraftYaw = true
                 self.yawDispatchGroup.leave()
                 print("Timeout on aircraft yaw!")
