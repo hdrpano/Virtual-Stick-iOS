@@ -410,7 +410,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.vsController.vsMove(pitch: 0, roll: self.vsSpeed, yaw: Float(bearing), vertical: Float(self.vsTargetAltitude))
         
         // We reach the waypoint
-        if distance < self.nearTargetDistance && self.aircraftAltitude - self.vsTargetAltitude < self.nearTargetDistance {
+        if distance < self.nearTargetDistance && self.aircraftAltitude - self.vsTargetAltitude < self.nearTargetDistance || !self.GCDProcess {
             self.vsController.vsMove(pitch: 0, roll: 0, yaw: Float(bearing), vertical: Float(self.vsTargetAltitude))
             self.GCDvs = true
             print("VS Mission step complete")
@@ -433,7 +433,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
                 direction = 1
             }
             if diff >= 180 { diff = abs(diff - 360) }
-            if diff < 2 { // 1.5° - 3°
+            if diff < 2 || !self.GCDProcess { // 1.5° - 3°
                 print("**** Aircraft yaw \(Int(diff*10)/10) yaw \(Int(self.aircraftHeading*10)/10) timeout \((time*10).rounded()/10)")
                 self.GCDaircraftYaw = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -462,7 +462,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         let time = self.start.timeIntervalSinceNow * -1 - self.GCDgimbalFT
         if !self.GCDgimbal && time > 0.9 {
             let pitchDiff = abs(self.gimbalPitch - self.vsTargetGimbalPitch)
-            if pitchDiff < 2 { //  1.5° - 3°
+            if pitchDiff < 2 || !self.GCDProcess { //  1.5° - 3°
                 print("Gimbal pitch \((pitchDiff*10).rounded()/10) heading \((self.aircraftHeading*10).rounded()/10)")
                 self.GCDgimbal = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
@@ -485,7 +485,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         let time = self.start.timeIntervalSinceNow * -1 - self.GCDphotoFT
         if !self.GCDphoto && time > 0.9 {
             print("Photo finished \(self.camController.getSDPhotoCount()) \(self.sdCardCount) \(time)")
-            if time > 3 || self.sdCardCount - self.camController.getSDPhotoCount() > 0 {
+            if time > 3 || self.sdCardCount - self.camController.getSDPhotoCount() > 0 || !self.GCDProcess {
                 self.GCDphoto = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25 ) {
                     self.photoDispatchGroup.leave() // send closure
@@ -553,7 +553,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
             
             print("Stop VS Star")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                if self.GCDProcess { self.stopVS() }
+                self.stopVS()
                 self.missionButton.setTitleColor(UIColor.white, for: .normal)
                 self.missionButton.setTitle("GPS Fly VS Mission", for: .normal)
             }
@@ -640,7 +640,7 @@ extension VirtualSticksViewController: DJIRemoteControllerDelegate {
         if self.GCDProcess && (state.leftStick.verticalPosition != 0 || (state.leftStick.horizontalPosition != 0 || state.rightStick.verticalPosition != 0 || state.rightStick.horizontalPosition != 0) || state.goHomeButton.isClicked.boolValue) {
             NSLog("Stop VS \(state.leftStick) \(state.rightStick)")
             self.missionButton.setTitle("VS Remote Interrupt", for: .normal)
-            self.stopVS()
+            self.GCDProcess = false
         }
     }
 }
