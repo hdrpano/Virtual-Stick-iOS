@@ -96,6 +96,7 @@ class VirtualSticksViewController: UIViewController, MKMapViewDelegate  {
         self.adapter = VideoPreviewerAdapter.init()
         self.adapter?.start()
         adapter?.setupFrameControlHandler()
+        camController.setCameraMode(cameraMode: .shootPhoto)
 
         // Grab a reference to the aircraft
         if let aircraft = DJISDKManager.product() as? DJIAircraft {
