@@ -33,11 +33,7 @@ class CameraFPVViewController: UIViewController {
         
         adapter = VideoPreviewerAdapter.init()
         adapter?.start()
-        
-        if camera?.displayName == DJICameraDisplayNameMavic2ZoomCamera ||
-            camera?.displayName == DJICameraDisplayNameMavic2ProCamera {
-            adapter?.setupFrameControlHandler()
-        }
+        adapter?.setupFrameControlHandler()
         
     }
 
