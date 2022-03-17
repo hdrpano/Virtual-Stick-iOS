@@ -9,14 +9,31 @@
 import DJISDK
 
 class CameraController {
-    //MARK: Set Camera Mode
+    //MARK: Flat Mode
     func setCameraMode(cameraMode: DJICameraMode = .shootPhoto) {
+        var flatMode:DJIFlatCameraMode = .photoSingle
         let camera = self.fetchCamera()
-        camera?.setMode(cameraMode, withCompletion: { (error: Error?) in
-            if error != nil {
-                NSLog("Error set mode photo/video");
+        if camera?.isFlatCameraModeSupported() != nil {
+            switch cameraMode {
+            case .shootPhoto:
+                flatMode = .photoSingle
+            case .recordVideo:
+                flatMode = .videoNormal
+            default:
+                flatMode = .photoSingle
             }
-        })
+            camera?.setFlatMode(flatMode, withCompletion: { (error: Error?) in
+                if error != nil {
+                    print("Error set camera flat mode photo/video");
+                }
+            })
+        } else {
+            camera?.setMode(cameraMode, withCompletion: { (error: Error?) in
+                if error != nil {
+                    NSLog("Error set mode photo/video");
+                }
+            })
+        }
     }
     
     //MARK:- Get SD Card Count

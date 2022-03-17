@@ -17,23 +17,16 @@ class CameraFPVViewController: UIViewController {
     @IBOutlet weak var fpvView: UIView!
     
     var adapter: VideoPreviewerAdapter?
-    var needToSetMode = false
-        
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let camera = fetchCamera()
-        camera?.delegate = self
-        
-        needToSetMode = true
         
         DJIVideoPreviewer.instance()?.start()
         
         adapter = VideoPreviewerAdapter.init()
         adapter?.start()
         adapter?.setupFrameControlHandler()
+        setCameraModeFlat(cameraMode: .shootPhoto)
         
     }
 
@@ -105,44 +98,46 @@ class CameraFPVViewController: UIViewController {
             }
         }
     }
-}
-
-/**
- *  DJICamera will send the live stream only when the mode is in DJICameraModeShootPhoto or DJICameraModeRecordVideo. Therefore, in order
- *  to demonstrate the FPV (first person view), we need to switch to mode to one of them.
- */
-extension CameraFPVViewController: DJICameraDelegate {
-    func camera(_ camera: DJICamera, didUpdate systemState: DJICameraSystemState) {
-        if systemState.mode != .recordVideo && systemState.mode != .shootPhoto {
-            return
-        }
-        if needToSetMode == false {
-            return
-        }
-        needToSetMode = false
-        camera.setMode(.shootPhoto) { [weak self] (error) in
-            if error != nil {
-                self?.needToSetMode = true
-            }
-        }
-        
-    }
     
-    func camera(_ camera: DJICamera, didUpdateTemperatureData temperature: Float) {
-        tempLabel.text = String(format: "%f", temperature)
-    }
-    
-}
-
-extension CameraFPVViewController {
-    fileprivate func fetchCamera() -> DJICamera? {
-        guard let product = DJISDKManager.product() else {
+    //MARK: Fetch Camera
+    func fetchCamera() -> DJICamera? {
+        if DJISDKManager.product() == nil {
             return nil
         }
         
-        if product is DJIAircraft || product is DJIHandheld {
-            return product.camera
+        if DJISDKManager.product() is DJIAircraft {
+            return (DJISDKManager.product() as! DJIAircraft).camera
+        } else if DJISDKManager.product() is DJIHandheld {
+            return (DJISDKManager.product() as! DJIHandheld).camera
         }
+        
         return nil
+    }
+    
+    //MARK: Flat Mode
+    func setCameraModeFlat(cameraMode: DJICameraMode = .shootPhoto) {
+        var flatMode:DJIFlatCameraMode = .photoSingle
+        let camera = self.fetchCamera()
+        if camera?.isFlatCameraModeSupported() != nil {
+            switch cameraMode {
+            case .shootPhoto:
+                flatMode = .photoSingle
+            case .recordVideo:
+                flatMode = .videoNormal
+            default:
+                flatMode = .photoSingle
+            }
+            camera?.setFlatMode(flatMode, withCompletion: { (error: Error?) in
+                if error != nil {
+                    print("Error set camera flat mode photo/video");
+                }
+            })
+        } else {
+            camera?.setMode(cameraMode, withCompletion: { (error: Error?) in
+                if error != nil {
+                    NSLog("Error set mode photo/video");
+                }
+            })
+        }
     }
 }
