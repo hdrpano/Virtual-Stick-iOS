@@ -10,7 +10,7 @@ class GPS {
     func degreesToRadians(degrees: Double) -> Double { return degrees * .pi / 180.0 }
     func radiansToDegrees(radians: Double) -> Double { return radians * 180.0 / .pi }
     
-    //MARK:- Yaw +/- 180°
+    //MARK: Yaw +/- 180°
     func yawControl(yaw: Float) -> Float {
         if yaw == 180 {
             return 180
@@ -19,7 +19,7 @@ class GPS {
         }
     }
        
-   //MARK:- GPS Bearing
+   //MARK: GPS Bearing
    func getBearingBetweenTwoPoints(point1 : CLLocationCoordinate2D, point2 : CLLocationCoordinate2D) -> Double {
        
        let lat1 = self.degreesToRadians(degrees: point1.latitude)
@@ -41,7 +41,7 @@ class GPS {
        return self.radiansToDegrees(radians: radiansBearing)
    }
    
-   //MARK:- GPS Distance
+   //MARK: GPS Distance
    func getDistanceBetweenTwoPoints(point1 : CLLocationCoordinate2D, point2 : CLLocationCoordinate2D) -> Double {
        
        let lat1 = self.degreesToRadians(degrees: point1.latitude)
@@ -54,28 +54,28 @@ class GPS {
        
    }
    
-   //MARK:- GPS Lat
+   //MARK: GPS Lat
    func latm(latitude: Double, distance: Double, bearing: Float, radiusM: Double = 6371000) -> Double {
        let dr: Double = .pi / 180.0
        let rd: Double = 180.0 / .pi
        return asin(sin(latitude*dr) * cos(distance/radiusM) + cos(latitude*dr) * sin(distance/radiusM) * cos(Double(bearing)*dr)) * rd
    }
    
-   //MARK:- GPS Lon
+   //MARK: GPS Lon
    func lonm(latitude: Double, longitude: Double, latitudeM: Double, distance: Double, bearing: Float, radiusM: Double = 6371000) -> Double {
        let dr: Double = .pi / 180.0
        let rd: Double = 180.0 / .pi
        return longitude + atan2(sin(Double(bearing)*dr) * sin(distance/radiusM) * cos(latitude*dr), cos(distance/radiusM) - sin(latitude*dr) * sin(latitudeM*dr)) * rd
    }
    
-   //MARK:- GPS New Coordinate
+   //MARK: GPS New Coordinate
    func newCoor(latitude: Double, longitude: Double, distance: Double, bearing: Float, radiusM: Double = 6371000) -> CLLocationCoordinate2D {
        let latitudeM: Double = self.latm(latitude: latitude, distance: distance, bearing: bearing, radiusM: radiusM)
        let longitudeM: Double = self.lonm(latitude: latitude, longitude: longitude, latitudeM: latitudeM, distance: distance, bearing: bearing, radiusM: radiusM)
        return CLLocationCoordinate2DMake(latitudeM, longitudeM)
    }
    
-   //MARK:- GPS Near
+   //MARK: GPS Near
    func near(yaw: Double, target: Double, tol: Double) -> Bool {
        if yaw - target <= tol && target - yaw <= tol {
            return true
@@ -84,7 +84,7 @@ class GPS {
        }
    }
     
-    //MARK:- GPS Coordinate String
+    //MARK: GPS Coordinate String
     func coordinateString(_ latitude: Double,_ longitude: Double) -> String {
         var latSeconds = Int(latitude * 3600)
         let latDegrees = latSeconds / 3600
@@ -106,7 +106,7 @@ class GPS {
                       longDegrees >= 0 ? "E" : "W" )
     }
     
-    //MARK:- GPS Star Mission
+    //MARK: GPS Star Mission
     func star(radius: Double, points: Int, latitude: Double, longitude: Double, altitude: Double, pitch: Double) -> [[Double]] {
         var grid: Array = [[Double]]()
         var coor: CLLocationCoordinate2D

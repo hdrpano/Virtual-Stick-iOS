@@ -7,7 +7,7 @@
 //
 
 class VirtualSticksController {
-    //MARK:- Start Virtual Stick
+    //MARK: Start Virtual Stick
     func startVirtualStick(enabled: Bool = true) {
         guard let virtualStickKey = DJIFlightControllerKey(param: DJIFlightControllerParamVirtualStickControlModeEnabled) else {
             return;
@@ -21,7 +21,7 @@ class VirtualSticksController {
         })
     }
     
-    //MARK:- Start Advanced Virtual Stick
+    //MARK: Start Advanced Virtual Stick
     func startAdvancedVirtualStick(enabled: Bool = true) {
         guard let virtualStickKey = DJIFlightControllerKey(param: DJIFlightControllerParamVirtualStickAdvancedControlModeEnabled) else {
             return;
@@ -35,7 +35,7 @@ class VirtualSticksController {
         })
     }
     
-    //MARK:- Stop Virtual Stick
+    //MARK: Stop Virtual Stick
     func stopVirtualStick() {
         guard let virtualStickKey = DJIFlightControllerKey(param: DJIFlightControllerParamVirtualStickControlModeEnabled) else {
             return;
@@ -49,7 +49,7 @@ class VirtualSticksController {
         })
     }
     
-    //MARK:- Stop Advanced Virtual Stick
+    //MARK: Stop Advanced Virtual Stick
     func stopAdvancedVirtualStick() {
         guard let virtualStickKey = DJIFlightControllerKey(param: DJIFlightControllerParamVirtualStickAdvancedControlModeEnabled) else {
             return;
@@ -63,7 +63,7 @@ class VirtualSticksController {
         })
     }
     
-    //MARK:- Is Virtual Stick
+    //MARK: Is Virtual Stick
     func isVirtualStick() -> Bool {
         guard let virtualStickKey = DJIFlightControllerKey(param: DJIFlightControllerParamVirtualStickControlModeEnabled) else {
             return false
@@ -79,7 +79,7 @@ class VirtualSticksController {
         return vsValue
     }
     
-    //MARK:- Is Advanced Virtual Stick
+    //MARK: Is Advanced Virtual Stick
     func isVirtualStickAdvanced() -> Bool {
         guard let virtualStickKey = DJIFlightControllerKey(param: DJIFlightControllerParamVirtualStickAdvancedControlModeEnabled) else {
             return false
@@ -95,7 +95,7 @@ class VirtualSticksController {
         return vsValue
     }
     
-    //MARK:- Move Gimbal
+    //MARK: Move Gimbal
     func moveGimbal(pitch: Float, roll: Float = 0, yaw: Float = 0, time: Double = 1.0, rotationMode: DJIGimbalRotationMode = DJIGimbalRotationMode.absoluteAngle) {
         // Rotation is relative to aicraft heading where 0 degrees is nose of aircraft, realitve means to the last position, absolut means to the heading
         let rotation: DJIGimbalRotation = DJIGimbalRotation.init(pitchValue: pitch as NSNumber, rollValue: roll as NSNumber, yawValue: yaw as NSNumber, time: time as TimeInterval, mode: rotationMode, ignore: true)
@@ -112,7 +112,7 @@ class VirtualSticksController {
         }
     }
     
-    //MARK:- Yaw Aircraft Virtual Stick
+    //MARK: Yaw Aircraft Virtual Stick
     func vsYaw(velocity: Float) {
         let fc = self.fetchFlightController()
         fc?.rollPitchCoordinateSystem = .body
@@ -128,7 +128,7 @@ class VirtualSticksController {
         })
     }
     
-    //MARK:- Virtual Stick Move
+    //MARK: Virtual Stick Move
     func vsMove(pitch: Float, roll: Float, yaw: Float, vertical: Float) {
         let fc = fetchFlightController()
         fc?.rollPitchCoordinateSystem = .body
@@ -145,7 +145,7 @@ class VirtualSticksController {
         })
     }
     
-    //MARK:- Front LEDs On Off
+    //MARK: Front LEDs On Off
     func frontLed(frontLEDs: Bool) {
         let FC = self.fetchFlightController()
         if FC != nil {
@@ -162,7 +162,7 @@ class VirtualSticksController {
         }
     }
     
-    //MARK:- Is Advanced Virtual Stick
+    //MARK: Is Advanced Virtual Stick
     func velocity() -> Double {
         guard let velocityKey = DJIFlightControllerKey(param: DJIFlightControllerParamVelocity) else {
             return 0
@@ -181,7 +181,7 @@ class VirtualSticksController {
         return speed
     }
     
-    //MARK:- Get Remaining Power
+    //MARK: Get Remaining Power
     func getChargeRemainingInPercent() -> Int {
         guard let chargeKey = DJIBatteryKey(param: DJIBatteryParamChargeRemainingInPercent) else {
             return 0
@@ -193,7 +193,7 @@ class VirtualSticksController {
         return chargeValue
     }
     
-    //MARK:- Flight Gimbal
+    //MARK: Flight Gimbal
     func fetchGimbal() -> DJIGimbal? {
         
         if DJISDKManager.product() == nil {
@@ -209,7 +209,7 @@ class VirtualSticksController {
         return nil
     }
     
-    //MARK:- Camera
+    //MARK: Camera
     func fetchCamera() -> DJICamera? {
         
         if DJISDKManager.product() == nil {
@@ -225,7 +225,7 @@ class VirtualSticksController {
         return nil
     }
     
-    //MARK:- Flight Controller
+    //MARK: Flight Controller
     func fetchFlightController() -> DJIFlightController? {
         
         if DJISDKManager.product() == nil {

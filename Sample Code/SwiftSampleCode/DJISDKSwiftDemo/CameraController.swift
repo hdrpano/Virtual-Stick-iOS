@@ -24,7 +24,7 @@ class CameraController {
             }
             camera?.setFlatMode(flatMode, withCompletion: { (error: Error?) in
                 if error != nil {
-                    print("Error set camera flat mode photo/video");
+                    NSLog("Error set camera flat mode photo/video");
                 }
             })
         } else {
@@ -36,7 +36,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Get SD Card Count
+    //MARK: Get SD Card Count
     func getSDPhotoCount() -> Int {
         guard let sdCountKey = DJICameraKey(param: DJICameraParamSDCardAvailablePhotoCount) else {
             return 0
@@ -48,7 +48,7 @@ class CameraController {
         return sdCountValue
     }
     
-    //MARK:- Get Ratio
+    //MARK: Get Ratio
     func getRatio() -> DJICameraPhotoAspectRatio {
         guard let ratioKey = DJICameraKey(param: DJICameraParamPhotoAspectRatio) else {
             return DJICameraPhotoAspectRatio.ratioUnknown
@@ -69,7 +69,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Start Shoot Photo
+    //MARK: Start Shoot Photo
     func startShootPhoto() {
         let camera = self.fetchCamera()
         if camera != nil {
@@ -81,7 +81,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Stop Shoot Photo
+    //MARK: Stop Shoot Photo
     func stopShootPhoto() {
         let camera = self.fetchCamera()
         if camera != nil {
@@ -93,7 +93,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Start Record Video
+    //MARK: Start Record Video
     func startRecordVideo() {
         let camera = self.fetchCamera()
         if camera != nil {
@@ -105,7 +105,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Stop Record Video
+    //MARK: Stop Record Video
     func stopRecordVideo() {
         let camera = self.fetchCamera()
         if camera != nil {
@@ -117,7 +117,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Set Shoot Mode Single AEB ...
+    //MARK: Set Shoot Mode Single AEB ...
     func setShootMode(shootMode: DJICameraShootPhotoMode = .single) {
         let camera = self.fetchCamera()
         if camera != nil {
@@ -129,7 +129,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Set Time Intervall
+    //MARK: Set Time Intervall
     func setTimeIntervall(interval: UInt16 = 2, count: UInt8 = 255) {
         let camera = self.fetchCamera()
         var settings = DJICameraPhotoTimeIntervalSettings()
@@ -144,7 +144,7 @@ class CameraController {
         }
     }
     
-    //MARK:- Camera
+    //MARK: Camera
     func fetchCamera() -> DJICamera? {
         
         if DJISDKManager.product() == nil {
