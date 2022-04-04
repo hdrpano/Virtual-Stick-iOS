@@ -118,7 +118,7 @@ class CameraFPVViewController: UIViewController {
     func setCameraModeFlat(cameraMode: DJICameraMode = .shootPhoto) {
         var flatMode:DJIFlatCameraMode = .photoSingle
         let camera = self.fetchCamera()
-        if camera?.isFlatCameraModeSupported() != nil {
+        if camera?.isFlatCameraModeSupported() == true {
             NSLog("Flat camera mode detected")
             switch cameraMode {
             case .shootPhoto:
